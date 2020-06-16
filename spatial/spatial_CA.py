@@ -1,7 +1,7 @@
 import numpy as np
 
 SIZE = 100
-SURVIVAL = {0:0.8, 1:0.8}
+SURVIVAL = {1:0.8, 2:0.8}
 EMPTY_CELLS = 0.2
 
 
@@ -21,7 +21,7 @@ def initialise():
     for i in range(len(grid_a)):
         for j in range(len(grid_a[0])):
             r = np.random.uniform(0, 1)
-            if r > 0.8:
+            if r < EMPTY_CELLS:
                 grid_a[i][j] = 0
                 grid_b[i][j] = 0
 
@@ -29,7 +29,29 @@ def initialise():
     return grid, grid_a, grid_b
 
 def survival(grids):
+    grid, grid_a, grid_b = grids
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
 
+            # if empty cell, continue
+            if grid_a[i][j] == 0:
+                continue
+
+            # get chance
+            if not grid[i][j] == grid_a[i][j]:
+                chance = 1 - SURVIVAL[grid_a[i][j]]
+            else:
+                chance = SURVIVAL[grid_a[i][j]]
+
+            # draw number
+            r = np.random.uniform(0, 1)
+
+            # death event
+            if r > chance:
+                grid_a[i][j] = 0
+                grid_b[i][j] = 0
+
+    grids = [grid, grid_a, grid_b]
     return grids
 
 def mating(grids):
@@ -45,3 +67,4 @@ grid, grid_a, grid_b = initialise()
 print(grid_a[0])
 print(grid_b[0])
 grids = [grid, grid_a, grid_b]
+grids = survival(grids)
