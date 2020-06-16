@@ -1,6 +1,6 @@
 import numpy as np
 
-SIZE = 100
+SIZE = 10
 SURVIVAL = {1:0.8, 2:0.8}
 EMPTY_CELLS = 0.2
 
@@ -11,7 +11,7 @@ def initialise():
     # create grids randomly
 
     # create habitat grid
-    grid = np.random.randint(low=0,high=2,size=(size,size))
+    grid = np.random.randint(low=1,high=3,size=(size,size))
 
     # create allele grids
     grid_a = np.random.randint(low=1, high=3,size=(size,size))
@@ -32,7 +32,6 @@ def survival(grids):
     grid, grid_a, grid_b = grids
     for i in range(len(grid)):
         for j in range(len(grid[0])):
-
             # if empty cell, continue
             if grid_a[i][j] == 0:
                 continue
@@ -64,7 +63,6 @@ def dispersal(grids):
 
 
 grid, grid_a, grid_b = initialise()
-print(grid_a[0])
-print(grid_b[0])
+
 grids = [grid, grid_a, grid_b]
 grids = survival(grids)
