@@ -335,10 +335,17 @@ def make_figure(grids, plot=True):
 # grid_a = np.array([[1,1,2], [0,0,2], [2,2,0]])
 # grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
 
-def linkage_diseq():
-    ld = 0
+def linkage_diseq(S):
+    (S1, S2, S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB) = S
+    N0 = S1ab + S2ab
+    N1 = S1aB + S2aB
+    N2 = S1Ab + S2Ab
+    N3 = S1AB + S2AB
+    L = S1 + S2
 
-    return
+    ld = ((N0*N3) - (N1*N2)) / L**2
+
+    return ld
 
 
 def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS):
@@ -357,11 +364,17 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     type_3 = []
     type_4 = []
 
+    # holds all linkage diseq. vals
+    ld_array = []
     for i in range(iterations):
         grids = survival(grids)
 
         # let op, output hier zijn 5 elementen
         grids, S = mating(grids)
+
+        # calculate ld and add to array
+        ld = linkage_diseq(S)
+        ld_array.append(ld)
 
         # en hier weer 3
         grids = dispersal(grids)
@@ -403,6 +416,9 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     plt.plot(x, type_3, label="3")
     plt.plot(x, type_4, label="4")
     plt.legend()
+    plt.show()
+
+    plt.plot(ld_array)
     plt.show()
 
     return figure
