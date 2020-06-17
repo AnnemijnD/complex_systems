@@ -109,28 +109,29 @@ def mating(grids):
     for i in range(len(grid)):
         for j in range(len(grid[0])):
             p = np.random.uniform(0, 1)
-            if grid_a[j][i] == 0 & grid_b[j][i] == 0:
+            if grid_a[j][i] == 0 and grid_b[j][i] == 0:
                 continue
 
-            elif grid_a[j][i] == 1 & grid_b[j][i] == 1:
+            elif grid_a[j][i] == 1 and grid_b[j][i] == 1:
                 if p < MATING:
                     S1ab += 1
                 else:
                     S2ab += 1
 
-            elif grid_a[j][i] == 1 & grid_b[j][i] == 2:
+            elif grid_a[j][i] == 1 and grid_b[j][i] == 2:
                 if p < MATING:
                     S2aB += 1
                 else:
                     S1aB += 1
 
-            elif grid_a[j][i] == 2 & grid_b[j][i] == 1:
+            elif grid_a[j][i] == 2 and grid_b[j][i] == 1:
                 if p < MATING:
                     S1Ab += 1
                 else:
                     S2Ab += 1
 
-            elif grid_a[j][i] == 2 & grid_b[j][i] == 2:
+
+            elif grid_a[j][i] == 2 and grid_b[j][i] == 2:
                 if p < MATING:
                     S2AB += 1
                 else:
@@ -160,7 +161,7 @@ def mating(grids):
                 offspring_a[j][i] = 0
                 offspring_b[j][i] = 0
 
-            elif grid_a[j][i] == 1 & grid_b[j][i] == 1:
+            elif grid_a[j][i] == 1 and grid_b[j][i] == 1:
                 p1, p2, p3, p4 = p_matrix[0]
                 if p < p1:
                     offspring_a[j][i] = 1
@@ -175,7 +176,7 @@ def mating(grids):
                     offspring_a[j][i] = 2
                     offspring_b[j][i] = 2
 
-            elif grid_a[j][i] == 1 & grid_b[j][i] == 2:
+            elif grid_a[j][i] == 1 and grid_b[j][i] == 2:
                 p1, p2, p3, p4 = p_matrix[1]
                 if p < p1:
                     offspring_a[j][i] = 1
@@ -190,7 +191,7 @@ def mating(grids):
                     offspring_a[j][i] = 2
                     offspring_b[j][i] = 1
 
-            elif grid_a[j][i] == 2 & grid_b[j][i] == 1:
+            elif grid_a[j][i] == 2 and grid_b[j][i] == 1:
                 p1, p2, p3, p4 = p_matrix[2]
                 if p < p1:
                     offspring_a[j][i] = 2
@@ -205,7 +206,7 @@ def mating(grids):
                     offspring_a[j][i] = 1
                     offspring_b[j][i] = 2
 
-            elif grid_a[j][i] == 2 & grid_b[j][i] == 2:
+            elif grid_a[j][i] == 2 and grid_b[j][i] == 2:
                 p1, p2, p3, p4 = p_matrix[3]
                 if p < p1:
                     offspring_a[j][i] = 2
@@ -304,6 +305,7 @@ def dispersal(grids):
 
     grids = [grid, grid_a, grid_b]
     return grids
+
 def make_plot(grids):
 
     grid, grid_a, grid_b = grids
