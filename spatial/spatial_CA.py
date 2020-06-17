@@ -3,11 +3,21 @@ import random
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 # import numba
-
+import pickle
+global SIZE
 SIZE = 50
+
+global SURVIVAL
 SURVIVAL = {1:0.8, 2:0.8}
+
+global MATING
 MATING = 0.85
+
+global EMPTY_CELLS
 EMPTY_CELLS = 0.2
+
+global GRID_TYPE
+GRID_TYPE = "RANDOM"
 
 
 def rand_neumann(mat, i, j, offspring):
@@ -54,17 +64,55 @@ def rand_neumann(mat, i, j, offspring):
     return neighbors_inds
 
 
-def initialise():
-    size = SIZE
+def initialise(type="RANDOM"):
+    """
+    Initialises grid
+    Args:
+        type (str): RANDOM, STRUCTURED or NON_STRUCTURED
+
+    Returns:
+        grid (2D matrix): habitat grid
+        grid_a (2D matrix): Allele a grid
+        grid_b (2D matrix): Allele b grid
+
+    """
+    # size = SIZE
 
     # create grids randomly
 
     # create habitat grid
-    grid = np.random.randint(low=1,high=3,size=(size,size))
+    if type == "RANDOM":
+        grid = np.random.randint(low=1,high=3,size=(SIZE, SIZE))
+
+
+    elif type == "STRUCTURED":
+
+        print("SIZE",SIZE)
+        grid = np.zeros((SIZE, SIZE))
+
+        if SIZE % 2 == 1:
+            Hab1 = SIZE // 2
+        else:
+            Hab1 = SIZE // 2 - 1
+
+        for row in range(SIZE):
+            for col in range(SIZE):
+                if row <= Hab1:
+                    grid[row][col] = 1
+                else:
+                    grid[row][col] = 2
+
+    elif type == "NON_STRUCTURED":
+        try:
+            grid = pickle.load(open(f"non_struct_habs/SIZE={SIZE}.p", "rb"))
+
+        except:
+            grid = np.random.randint(low=1,high=3,size=(SIZE, SIZE))
+            pickle.dump(grid, open(f"non_struct_habs/SIZE={SIZE}.p", "wb"))
 
     # create allele grids
-    grid_a = np.random.randint(low=1, high=3,size=(size,size))
-    grid_b = np.random.randint(low=1, high=3,size=(size,size))
+    grid_a = np.random.randint(low=1, high=3,size=(SIZE, SIZE))
+    grid_b = np.random.randint(low=1, high=3,size=(SIZE, SIZE))
 
     # oeps toch een for loop
     for i in range(len(grid_a)):
@@ -73,7 +121,6 @@ def initialise():
             if r < EMPTY_CELLS:
                 grid_a[i][j] = 0
                 grid_b[i][j] = 0
-
 
     return grid, grid_a, grid_b
 
@@ -348,15 +395,24 @@ def linkage_diseq(S):
     return ld
 
 
-def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS):
+def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS, grid_type=GRID_TYPE):
 # Redefine global variables when specified
+    global SIZE
     SIZE = size
+
+    global SURVIVAL
     SURVIVAL = survive
+
+    global MATING
     MATING = p
+
+    global EMPTY_CELLS
     EMPTY_CELLS = empty
 
+    global GRID_TYPE
+    GRID_TYPE = grid_type
     # Initialise grid
-    grid, grid_a, grid_b = initialise()
+    grid, grid_a, grid_b = initialise(GRID_TYPE)
     grids = [grid, grid_a, grid_b]
 
     type_1 = []
