@@ -11,7 +11,8 @@ Optional arguments:
 - survive [dict] (default is {1:0.8, 2:0.8})
 - p [int] (default is 0.6)
 - empty [int] (default is 0.2)
+- grid_type [str] (default is RANDOM), options: RANDOM, STRUCTURED, NON_STRUCTURED
 """
 
 
-model.run_model(100, survive={1:0.8, 2:0.8}, p=1)
+model.run_model(10, size=20,survive={1:0.8, 2:0.8}, p=1, grid_type="STRUCTURED")
