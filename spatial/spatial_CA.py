@@ -2,8 +2,9 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
+import numba
 
-SIZE = 5
+SIZE = 50
 SURVIVAL = {1:0.8, 2:0.8}
 MATING = 0.6
 EMPTY_CELLS = 0.2
@@ -333,16 +334,25 @@ def make_plot(grids):
 # grid_a = np.array([[1,1,2], [0,0,2], [2,2,0]])
 # grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
 
-grid, grid_a, grid_b = initialise()
-grids = [grid, grid_a, grid_b]
+def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS):
+    # Redefine global variables when specified
+    SIZE = size
+    SURVIVAL = survive
+    MATING = p
+    EMPTY_CELLS = empty
 
-for i in range(50):
-    grids = survival(grids)
+    # Initialise grid
+    grid, grid_a, grid_b = initialise()
+    grids = [grid, grid_a, grid_b]
 
-    # let op, output hier zijn 5 elementen
-    grids = mating(grids)
+    # Run model for specified no. of iterations
+    for i in range(iterations):
+        grids = survival(grids)
 
-    # en hier weer 3
-    grids = dispersal(grids)
+        # let op, output hier zijn 5 elementen
+        grids = mating(grids)
 
-    make_plot(grids)
+        # en hier weer 3
+        grids = dispersal(grids)
+
+        return make_plot(grids)
