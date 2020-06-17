@@ -314,12 +314,12 @@ def make_plot(grids):
             if grid_a[row][col] == 1:
                 if grid_b[row][col] == 1:
                     figure[row][col] = 1
-                else:
+                elif grid_b[row][col] == 2:
                     figure[row][col] = 2
             elif grid_a[row][col] == 2:
                 if grid_b[row][col] == 1:
                     figure[row][col] = 3
-                else:
+                elif grid_b[row][col] == 2:
                     figure[row][col] = 4
     ax = sns.heatmap(figure)
     plt.show()
@@ -334,7 +334,7 @@ def make_plot(grids):
 grid, grid_a, grid_b = initialise()
 grids = [grid, grid_a, grid_b]
 
-for i in range(100):
+for i in range(50):
     grids = survival(grids)
 
     # let op, output hier zijn 5 elementen
