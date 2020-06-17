@@ -3,7 +3,7 @@ import random
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 
-SIZE = 5
+SIZE = 10
 SURVIVAL = {1:0.8, 2:0.8}
 MATING = 0.85
 EMPTY_CELLS = 0.2
@@ -109,31 +109,29 @@ def mating(grids):
     for i in range(len(grid)):
         for j in range(len(grid[0])):
             p = np.random.uniform(0, 1)
-            if grid_a[j][i] == 0 & grid_b[j][i] == 0:
+            if grid_a[j][i] == 0 and grid_b[j][i] == 0:
                 continue
 
-            elif grid_a[j][i] == 1 & grid_b[j][i] == 1:
-
+            elif grid_a[j][i] == 1 and grid_b[j][i] == 1:
                 if p < MATING:
                     S1ab += 1
                 else:
                     S2ab += 1
 
-            elif grid_a[j][i] == 1 & grid_b[j][i] == 2:
-
+            elif grid_a[j][i] == 1 and grid_b[j][i] == 2:
                 if p < MATING:
                     S2aB += 1
                 else:
                     S1aB += 1
 
-            elif grid_a[j][i] == 2 & grid_b[j][i] == 1:
-
+            elif grid_a[j][i] == 2 and grid_b[j][i] == 1:
                 if p < MATING:
                     S1Ab += 1
                 else:
                     S2Ab += 1
 
-            elif grid_a[j][i] == 2 & grid_b[j][i] == 2:
+
+            elif grid_a[j][i] == 2 and grid_b[j][i] == 2:
                 if p < MATING:
                     S2AB += 1
                 else:
@@ -163,7 +161,7 @@ def mating(grids):
                 offspring_a[j][i] = 0
                 offspring_b[j][i] = 0
 
-            elif grid_a[j][i] == 1 & grid_b[j][i] == 1:
+            elif grid_a[j][i] == 1 and grid_b[j][i] == 1:
                 p1, p2, p3, p4 = p_matrix[0]
                 if p < p1:
                     offspring_a[j][i] = 1
@@ -178,7 +176,7 @@ def mating(grids):
                     offspring_a[j][i] = 2
                     offspring_b[j][i] = 2
 
-            elif grid_a[j][i] == 1 & grid_b[j][i] == 2:
+            elif grid_a[j][i] == 1 and grid_b[j][i] == 2:
                 p1, p2, p3, p4 = p_matrix[1]
                 if p < p1:
                     offspring_a[j][i] = 1
@@ -193,7 +191,7 @@ def mating(grids):
                     offspring_a[j][i] = 2
                     offspring_b[j][i] = 1
 
-            elif grid_a[j][i] == 2 & grid_b[j][i] == 1:
+            elif grid_a[j][i] == 2 and grid_b[j][i] == 1:
                 p1, p2, p3, p4 = p_matrix[2]
                 if p < p1:
                     offspring_a[j][i] = 2
@@ -208,7 +206,7 @@ def mating(grids):
                     offspring_a[j][i] = 1
                     offspring_b[j][i] = 2
 
-            elif grid_a[j][i] == 2 & grid_b[j][i] == 2:
+            elif grid_a[j][i] == 2 and grid_b[j][i] == 2:
                 p1, p2, p3, p4 = p_matrix[3]
                 if p < p1:
                     offspring_a[j][i] = 2
@@ -307,7 +305,8 @@ def dispersal(grids):
 
     grids = [grid, grid_a, grid_b]
     return grids
-def make_plot(grids):
+
+def make_figure(grids, plot=True):
 
     grid, grid_a, grid_b = grids
 
@@ -324,9 +323,9 @@ def make_plot(grids):
                     figure[row][col] = 3
                 elif grid_b[row][col] == 2:
                     figure[row][col] = 4
-
-    ax = sns.heatmap(figure)
-    plt.show()
+    if plot:
+        ax = sns.heatmap(figure)
+        plt.show()
 
     return figure
 
@@ -337,11 +336,12 @@ def make_plot(grids):
 
 grid, grid_a, grid_b = initialise()
 grids = [grid, grid_a, grid_b]
-ones_a = []
-ones_b = []
-twos_a = []
-twos_b = []
-for i in range(1000):
+type_1 = []
+type_2 = []
+type_3 = []
+type_4 = []
+time = 10000
+for i in range(time):
     grids = survival(grids)
 
     # let op, output hier zijn 5 elementen
@@ -351,11 +351,36 @@ for i in range(1000):
     grids = dispersal(grids)
 
     grid, grid_a, grid_b = grids
-    unique, counts = np.unique(grid_a, return_counts=True)
-    #
-    # print(np.asarray((unique, counts)).T)
-    # unique, counts = np.unique(grid_b, return_counts=True)
-    #
-    # print(np.asarray((unique, counts)).T)
+    figure = make_figure(grids, plot=False)
 
-make_plot(grids)
+    unique, counts = np.unique(figure, return_counts=True)
+    freqs = np.asarray((unique, counts)).T
+    el_1 = 0
+    el_2 = 0
+    el_3 = 0
+    el_4 = 0
+    for j in freqs:
+
+
+        if j[0] == 1:
+            el_1 = j[1]
+        elif j[0] == 2:
+            el_2 = j[1]
+        elif j[0] == 3:
+            el_3 = j[1]
+        elif j[0] == 4:
+            el_4 = j[1]
+
+    type_1.append(el_1)
+    type_2.append(el_2)
+    type_3.append(el_3)
+    type_4.append(el_4)
+
+make_figure(grids)
+x = list(range(time))
+plt.plot(x, type_1, label="1")
+plt.plot(x, type_2, label="2")
+plt.plot(x, type_3, label="3")
+plt.plot(x, type_4, label="4")
+plt.legend()
+plt.show()
