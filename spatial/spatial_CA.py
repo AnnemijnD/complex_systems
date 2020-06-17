@@ -2,8 +2,9 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
+# import numba
 
-SIZE = 10
+SIZE = 50
 SURVIVAL = {1:0.8, 2:0.8}
 MATING = 0.85
 EMPTY_CELLS = 0.2
@@ -329,58 +330,72 @@ def make_figure(grids, plot=True):
 
     return figure
 
-# fake data
-# grid = np.array([[1,1,1], [2,1,2], [2,2,2]])
-# grid_a = np.array([[1,1,2], [0,0,2], [2,2,0]])
-# grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
+    # fake data
+    # grid = np.array([[1,1,1], [2,1,2], [2,2,2]])
+    # grid_a = np.array([[1,1,2], [0,0,2], [2,2,0]])
+    # grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
+def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS):
+# Redefine global variables when specified
+    SIZE = size
+    SURVIVAL = survive
+    MATING = p
+    EMPTY_CELLS = empty
 
-grid, grid_a, grid_b = initialise()
-grids = [grid, grid_a, grid_b]
-type_1 = []
-type_2 = []
-type_3 = []
-type_4 = []
-time = 10000
-for i in range(time):
-    grids = survival(grids)
+    # Initialise grid
+    grid, grid_a, grid_b = initialise()
+    grids = [grid, grid_a, grid_b]
 
-    # let op, output hier zijn 5 elementen
-    grids = mating(grids)
+    type_1 = []
+    type_2 = []
+    type_3 = []
+    type_4 = []
 
-    # en hier weer 3
-    grids = dispersal(grids)
+    for i in range(iterations):
+        grids = survival(grids)
 
-    grid, grid_a, grid_b = grids
-    figure = make_figure(grids, plot=False)
+        # let op, output hier zijn 5 elementen
+        grids = mating(grids)
 
-    unique, counts = np.unique(figure, return_counts=True)
-    freqs = np.asarray((unique, counts)).T
-    el_1 = 0
-    el_2 = 0
-    el_3 = 0
-    el_4 = 0
-    for j in freqs:
+        # en hier weer 3
+        grids = dispersal(grids)
+
+        grid, grid_a, grid_b = grids
+        figure = make_figure(grids, plot=False)
+
+        # keep up data for the plots
+        unique, counts = np.unique(figure, return_counts=True)
+        freqs = np.asarray((unique, counts)).T
+        el_1 = 0
+        el_2 = 0
+        el_3 = 0
+        el_4 = 0
+        for j in freqs:
+
+            if j[0] == 1:
+                el_1 = j[1]
+            elif j[0] == 2:
+                el_2 = j[1]
+            elif j[0] == 3:
+                el_3 = j[1]
+            elif j[0] == 4:
+                el_4 = j[1]
+
+        type_1.append(el_1)
+        type_2.append(el_2)
+        type_3.append(el_3)
+        type_4.append(el_4)
+
+    # mkake figure
+    figure = make_figure(grids)
+    x = list(range(iterations))
 
 
-        if j[0] == 1:
-            el_1 = j[1]
-        elif j[0] == 2:
-            el_2 = j[1]
-        elif j[0] == 3:
-            el_3 = j[1]
-        elif j[0] == 4:
-            el_4 = j[1]
+    # make freq plots
+    plt.plot(x, type_1, label="1")
+    plt.plot(x, type_2, label="2")
+    plt.plot(x, type_3, label="3")
+    plt.plot(x, type_4, label="4")
+    plt.legend()
+    plt.show()
 
-    type_1.append(el_1)
-    type_2.append(el_2)
-    type_3.append(el_3)
-    type_4.append(el_4)
-
-make_figure(grids)
-x = list(range(time))
-plt.plot(x, type_1, label="1")
-plt.plot(x, type_2, label="2")
-plt.plot(x, type_3, label="3")
-plt.plot(x, type_4, label="4")
-plt.legend()
-plt.show()
+    return figure
