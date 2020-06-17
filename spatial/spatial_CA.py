@@ -343,7 +343,7 @@ def linkage_diseq(S):
     N3 = S1AB + S2AB
     L = S1 + S2
 
-    ld = ((N0*N3) - (N1*N2)) / L**2
+    ld = ((N0*N3)-(N1*N2)) / (L**2)
 
     return ld
 
