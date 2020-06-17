@@ -14,4 +14,4 @@ Optional arguments:
 """
 
 
-model.run_model(10000, survive={1:0.7, 2:0.7}, p=0.5)
+model.run_model(100, survive={1:0.7, 2:0.7}, p=0.5)

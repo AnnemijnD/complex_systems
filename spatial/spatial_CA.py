@@ -230,7 +230,7 @@ def mating(grids):
 
     grids.append(offspring_a)
     grids.append(offspring_b)
-    return grids, S
+    return grids, Sab
 
 # Calculates probabilities
 def probabilities(S):
@@ -336,7 +336,9 @@ def make_figure(grids, plot=True):
 # grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
 
 def linkage_diseq():
-    ld =
+    ld = 0
+
+    return
 
 
 def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS):
