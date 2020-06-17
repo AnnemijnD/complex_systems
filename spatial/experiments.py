@@ -15,4 +15,4 @@ Optional arguments:
 """
 
 
-model.run_model(10, size=20,survive={1:0.8, 2:0.8}, p=1, grid_type="STRUCTURED")
+model.run_model(1000, survive={1:0.7, 2:0.7}, p=0.5, grid_type="STRUCTURED")
