@@ -233,50 +233,100 @@ def mating(grids):
 # Calculates probabilities
 def probabilities(S):
 
-    p1 = ((MATING/S[0])*(S[2]+.5*S[3]+.5*S[4]+.25*S[5])+((1-MATING)/S[1])
-          *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
-    p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
-    p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
-    p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[1]))*(S[9])
+    try:
+        p1 = ((MATING/S[0])*(S[2]+.5*S[3]+.5*S[4]+.25*S[5])+((1-MATING)/S[1])
+              *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
+    except:
+        p1 = 0
+
+    try:
+        p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+    except:
+        p2 = 0
+
+    try:
+        p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+    except:
+        p3 = 0
+
+    try:
+        p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[1]))*(S[9])
+    except:
+        p4 = 0
 
     return p1, p2, p3, p4
 
 def dispersal(grids):
+    """
+    Places offspring in empty positions in the grid
+    """
     grid, grid_a, grid_b, offspring_a, offspring_b = grids
 
     for row in range(len(grid)):
         for col in range(len(grid[0])):
+
+            # vind lege cel
             if grid_a[row][col] == 0:
 
                 # get neighbors with offspring (von neumann)
                 neighbors_inds = rand_neumann(grid_a, row, col, offspring_a)
 
+                # als maar 1 neighbor: plaats deze in de cel
                 if len(neighbors_inds) == 1:
                     neigh = neighbors_inds[0]
                     x = neigh[0]
                     y = neigh[1]
 
+                    # plaats offspring in lege cel
                     grid_a[row][col] = offspring_a[x][y]
                     grid_b[row][col] = offspring_b[x][y]
+
+                    # verwijder offspring
                     offspring_a[x][y] = 0
                     offspring_b[x][y] = 0
 
 
+                # kies random offspring van de neigbors
                 elif not len(neighbors_inds) == 0:
                     rand_ind = random.randint(0, len(neighbors_inds) - 1)
                     chosen_neigh = neighbors_inds[rand_ind]
                     x = chosen_neigh[0]
                     y = chosen_neigh[1]
+
+                    # plaats offspring in lege cel
                     grid_a[row][col] = offspring_a[x][y]
                     grid_b[row][col] = offspring_b[x][y]
-
+                    
+                    # verwijder offspring
                     offspring_a[x][y] = 0
                     offspring_b[x][y] = 0
 
 
     grids = [grid, grid_a, grid_b]
     return grids
+def make_plot(grids):
 
+    grid, grid_a, grid_b = grids
+
+    figure = np.zeros((SIZE, SIZE))
+    for row in range(len(grid[0])):
+        for col in range(len(grid[0])):
+            if grid_a[row][col] == 1:
+                if grid_b[row][col] == 1:
+                    figure[row][col] = 1
+                else:
+                    figure[row][col] = 2
+            else:
+                if grid_b[row][col] == 1:
+                    figure[row][col] = 3
+                else:
+                    figure[row][col] = 4
+    ax = sns.heatmap(figure)
+    plt.show()
+
+    return figure
+
+# fake data
 # grid = np.array([[1,1,1], [2,1,2], [2,2,2]])
 # grid_a = np.array([[1,1,2], [0,0,2], [2,2,0]])
 # grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
@@ -284,27 +334,13 @@ def dispersal(grids):
 grid, grid_a, grid_b = initialise()
 grids = [grid, grid_a, grid_b]
 
-for i in range(1):
+for i in range(100):
     grids = survival(grids)
+
+    # let op, output hier zijn 5 elementen
     grids = mating(grids)
 
+    # en hier weer 3
     grids = dispersal(grids)
 
-
-grid, grid_a, grid_b = grids
-
-figure = np.zeros((SIZE, SIZE))
-for row in range(len(grid[0])):
-    for col in range(len(grid[0])):
-        if grid_a[row][col] == 1:
-            if grid_b[row][col] == 1:
-                figure[row][col] = 1
-            else:
-                figure[row][col] = 2
-        else:
-            if grid_b[row][col] == 1:
-                figure[row][col] = 3
-            else:
-                figure[row][col] = 4
-ax = sns.heatmap(figure)
-plt.show()
+make_plot(grids)
