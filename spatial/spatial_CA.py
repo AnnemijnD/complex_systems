@@ -230,7 +230,7 @@ def mating(grids):
 
     grids.append(offspring_a)
     grids.append(offspring_b)
-    return grids
+    return grids, S
 
 # Calculates probabilities
 def probabilities(S):
@@ -334,6 +334,10 @@ def make_plot(grids):
 # grid_a = np.array([[1,1,2], [0,0,2], [2,2,0]])
 # grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
 
+def linkage_diseq():
+    ld =
+
+
 def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS):
     # Redefine global variables when specified
     SIZE = size
@@ -350,9 +354,9 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         grids = survival(grids)
 
         # let op, output hier zijn 5 elementen
-        grids = mating(grids)
+        grids, S = mating(grids)
 
         # en hier weer 3
         grids = dispersal(grids)
 
-        return make_plot(grids)
+    return make_plot(grids)
