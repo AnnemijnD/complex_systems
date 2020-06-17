@@ -296,7 +296,7 @@ def dispersal(grids):
                     # plaats offspring in lege cel
                     grid_a[row][col] = offspring_a[x][y]
                     grid_b[row][col] = offspring_b[x][y]
-                    
+
                     # verwijder offspring
                     offspring_a[x][y] = 0
                     offspring_b[x][y] = 0
@@ -316,7 +316,7 @@ def make_plot(grids):
                     figure[row][col] = 1
                 else:
                     figure[row][col] = 2
-            else:
+            elif grid_a[row][col] == 2:
                 if grid_b[row][col] == 1:
                     figure[row][col] = 3
                 else:
@@ -343,4 +343,4 @@ for i in range(100):
     # en hier weer 3
     grids = dispersal(grids)
 
-make_plot(grids)
+    make_plot(grids)
