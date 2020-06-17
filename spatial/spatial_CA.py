@@ -5,7 +5,7 @@ import seaborn as sns; sns.set()
 
 SIZE = 5
 SURVIVAL = {1:0.8, 2:0.8}
-MATING = 0.6
+MATING = 0.85
 EMPTY_CELLS = 0.2
 
 
@@ -113,18 +113,21 @@ def mating(grids):
                 continue
 
             elif grid_a[j][i] == 1 & grid_b[j][i] == 1:
+
                 if p < MATING:
                     S1ab += 1
                 else:
                     S2ab += 1
 
             elif grid_a[j][i] == 1 & grid_b[j][i] == 2:
+
                 if p < MATING:
                     S2aB += 1
                 else:
                     S1aB += 1
 
             elif grid_a[j][i] == 2 & grid_b[j][i] == 1:
+
                 if p < MATING:
                     S1Ab += 1
                 else:
@@ -321,6 +324,7 @@ def make_plot(grids):
                     figure[row][col] = 3
                 elif grid_b[row][col] == 2:
                     figure[row][col] = 4
+
     ax = sns.heatmap(figure)
     plt.show()
 
@@ -333,8 +337,11 @@ def make_plot(grids):
 
 grid, grid_a, grid_b = initialise()
 grids = [grid, grid_a, grid_b]
-
-for i in range(50):
+ones_a = []
+ones_b = []
+twos_a = []
+twos_b = []
+for i in range(1000):
     grids = survival(grids)
 
     # let op, output hier zijn 5 elementen
@@ -343,4 +350,12 @@ for i in range(50):
     # en hier weer 3
     grids = dispersal(grids)
 
-    make_plot(grids)
+    grid, grid_a, grid_b = grids
+    unique, counts = np.unique(grid_a, return_counts=True)
+    #
+    # print(np.asarray((unique, counts)).T)
+    # unique, counts = np.unique(grid_b, return_counts=True)
+    #
+    # print(np.asarray((unique, counts)).T)
+
+make_plot(grids)
