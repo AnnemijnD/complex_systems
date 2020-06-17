@@ -178,11 +178,26 @@ def mating(grids):
 # Calculates probabilities
 def probabilities(S):
 
-    p1 = ((MATING/S[0])*(S[2]+.5*S[3]+.5*S[4]+.25*S[5])+((1-MATING)/S[1])
-          *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
-    p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
-    p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
-    p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[1]))*(S[9])
+    try:
+        p1 = ((MATING/S[0])*(S[2]+.5*S[3]+.5*S[4]+.25*S[5])+((1-MATING)/S[1])
+              *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
+    except:
+        p1 = 0
+
+    try:
+        p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+    except:
+        p2 = 0
+
+    try:
+        p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+    except:
+        p3 = 0
+
+    try:
+        p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[1]))*(S[9])
+    except:
+        p4 = 0
 
     return p1, p2, p3, p4
 
