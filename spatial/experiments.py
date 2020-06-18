@@ -1,7 +1,8 @@
 import spatial_CA as model
+import numpy as np
 
 """
-Run the model through model.run_model(iterations, size, survive, p, empty)
+Run the model through model.run_model(iterations, size, survive, p, empty, grid_type)
 
 Necessary arguments:
 - iterations
@@ -15,4 +16,4 @@ Optional arguments:
 """
 
 
-model.run_model(1000, survive={1:0.7, 2:0.7}, p=0.5, grid_type="STRUCTURED")
+figure = model.run_model(1000, size=50, survive={1:0.95, 2:0.95}, p=0.5, grid_type="STRUCTURED")
