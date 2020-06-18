@@ -383,10 +383,7 @@ def make_figure(grids, plot=True):
 # grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
 
 def linkage_diseq(counts):
-    N4, N3, N1, N2, N0 = 0, 0, 0, 0, 0
-    pars = [N4, N3, N1, N2, N0]
-    for i in range(len(pars)):
-        pars[i]
+    N4, N3, N1, N2, N0 = counts
     ld = ((N0*N3)-(N1*N2)) / ((SIZE**2 - N4)**2)
 
     return ld
