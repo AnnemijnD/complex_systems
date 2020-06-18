@@ -29,7 +29,7 @@ def rand_neumann(mat, i, j, offspring):
     neighbors = []
     neighbors_inds = []
     try:
-        if not ((i - 1) < 0):
+        if not((i - 1) < 0):
             if offspring[i-1][j] > 0:
                 neighbors.append(mat[i-1][j])
                 neighbors_inds.append((i-1, j))
@@ -38,10 +38,10 @@ def rand_neumann(mat, i, j, offspring):
 
 
     try:
-        if not((j - 1) < 0):
-            if offspring[i][j-1] > 0:
-                neighbors.append(mat[i][j-1])
-                neighbors_inds.append((i, j-1))
+
+        if offspring[i][j-1] > 0:
+            neighbors.append(mat[i][j-1])
+            neighbors_inds.append((i, j-1))
     except:
         pass
 
@@ -271,9 +271,7 @@ def mating(grids):
 
     # offspring_a = np.array([[0,0,1], [0,0,2], [2,1,0]])
     # offspring_b = np.array([[0,0,1], [0,0,1], [1,1,0]])
-    # grids.append(offspring_a)
-    # grids.append(offspring_b)
-    # return grids
+
 
     grids.append(offspring_a)
     grids.append(offspring_b)
@@ -362,10 +360,12 @@ def make_figure(grids, plot=True):
     for row in range(len(grid[0])):
         for col in range(len(grid[0])):
             if grid_a[row][col] == 1:
+
                 if grid_b[row][col] == 1:
                     figure[row][col] = 1
                 elif grid_b[row][col] == 2:
                     figure[row][col] = 2
+
             elif grid_a[row][col] == 2:
                 if grid_b[row][col] == 1:
                     figure[row][col] = 3
@@ -416,7 +416,11 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
 
     # holds all linkage diseq. vals
     ld_array = []
+
+    prints = [100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500]
     for i in range(iterations):
+        if i in prints:
+            print(i)
         grids = survival(grids)
 
         # let op, output hier zijn 5 elementen
@@ -465,10 +469,10 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
 
 
     # make freq plots
-    plt.plot(x, type_1, label="1")
-    plt.plot(x, type_2, label="2")
-    plt.plot(x, type_3, label="3")
-    plt.plot(x, type_4, label="4")
+    plt.plot(x, type_1, label="ab")
+    plt.plot(x, type_2, label="aB")
+    plt.plot(x, type_3, label="Ab")
+    plt.plot(x, type_4, label="AB")
     plt.legend()
     plt.show()
 
