@@ -150,7 +150,7 @@ def survival(grids):
     return grids
 
 def mating(grids):
-    S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB = 0, 0, 0, 0, 0, 0, 0, 0
+    S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB, S0 = 0, 0, 0, 0, 0, 0, 0, 0, 0
     grid, grid_a, grid_b = grids
 
     # Loop over variables to assign into mating pools
@@ -158,7 +158,7 @@ def mating(grids):
         for j in range(len(grid[0])):
             p = np.random.uniform(0, 1)
             if grid_a[j][i] == 0 and grid_b[j][i] == 0:
-                continue
+                S0 += 1
 
             elif grid_a[j][i] == 1 and grid_b[j][i] == 1:
                 if p < MATING:
@@ -275,7 +275,7 @@ def mating(grids):
 
     grids.append(offspring_a)
     grids.append(offspring_b)
-    return grids, Sab
+    return grids
 
 # Calculates probabilities
 def probabilities(S):
@@ -382,15 +382,9 @@ def make_figure(grids, plot=True):
 # grid_a = np.array([[1,1,2], [0,0,2], [2,2,0]])
 # grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
 
-def linkage_diseq(S):
-    (S1, S2, S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB) = S
-    N0 = S1ab + S2ab
-    N1 = S1aB + S2aB
-    N2 = S1Ab + S2Ab
-    N3 = S1AB + S2AB
-    L = S1 + S2
-
-    ld = ((N0*N3) - (N1*N2)) / L**2
+def linkage_diseq(counts):
+    N4, N3, N1, N2, N0 = counts
+    ld = ((N0*N3)-(N1*N2)) / ((SIZE**2 - N4)**2)
 
     return ld
 
@@ -429,12 +423,8 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
             print(i)
         grids = survival(grids)
 
-        # let op, grids output hier is 5 elementen
-        grids, S = mating(grids)
-
-        # calculate ld and add to array
-        ld = linkage_diseq(S)
-        ld_array.append(ld)
+        # let op, output hier zijn 5 elementen
+        grids = mating(grids)
 
         # en hier weer 3
         grids = dispersal(grids)
@@ -445,13 +435,16 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         # keep up data for the plots
         unique, counts = np.unique(figure, return_counts=True)
         freqs = np.asarray((unique, counts)).T
+        el_0 = 0
         el_1 = 0
         el_2 = 0
         el_3 = 0
         el_4 = 0
         for j in freqs:
 
-            if j[0] == 1:
+            if j[0] == 0:
+                el_0 = j[1]
+            elif j[0] == 1:
                 el_1 = j[1]
             elif j[0] == 2:
                 el_2 = j[1]
@@ -464,6 +457,11 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         type_2.append(el_2)
         type_3.append(el_3)
         type_4.append(el_4)
+
+        # calculate ld and add to array
+        ld_counts = [el_0, el_1, el_2, el_3, el_4]
+        ld = linkage_diseq(ld_counts)
+        ld_array.append(ld)
 
     # mkake figure
     figure = make_figure(grids)
