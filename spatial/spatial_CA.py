@@ -2,6 +2,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
+import matplotlib.colors as mcolors
 # import numba
 import pickle
 global SIZE
@@ -38,7 +39,6 @@ def rand_neumann(mat, i, j, offspring):
 
 
     try:
-
         if offspring[i][j-1] > 0:
             neighbors.append(mat[i][j-1])
             neighbors_inds.append((i, j-1))
@@ -87,7 +87,6 @@ def initialise(type="RANDOM"):
 
     elif type == "STRUCTURED":
 
-        print("SIZE",SIZE)
         grid = np.zeros((SIZE, SIZE))
 
         if SIZE % 2 == 1:
@@ -128,6 +127,7 @@ def survival(grids):
     grid, grid_a, grid_b = grids
     for i in range(len(grid)):
         for j in range(len(grid[0])):
+
             # if empty cell, continue
             if grid_a[i][j] == 0:
                 continue
@@ -147,6 +147,7 @@ def survival(grids):
                 grid_b[i][j] = 0
 
     grids = [grid, grid_a, grid_b]
+    # print(make_figure(grids, plot=True))
     return grids
 
 def mating(grids):
@@ -372,7 +373,9 @@ def make_figure(grids, plot=True):
                 elif grid_b[row][col] == 2:
                     figure[row][col] = 4
     if plot:
-        ax = sns.heatmap(figure)
+        norm = plt.Normalize(0,4)
+        cmap = mcolors.LinearSegmentedColormap.from_list("n",['#FFFFFF','#20639B','#3CAEA3','#F6D55C','#ED553B'])
+        sns.heatmap(figure, clim=(0, 4),cmap=cmap, norm=norm, vmin=0, vmax=4)
         plt.show()
 
     return figure
