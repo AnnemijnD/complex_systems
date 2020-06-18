@@ -298,7 +298,7 @@ def probabilities(S):
         p3 = 0
 
     try:
-        p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[1]))*(S[9])
+        p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
     except:
         p4 = 0
 
