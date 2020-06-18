@@ -29,19 +29,19 @@ def rand_neumann(mat, i, j, offspring):
     neighbors = []
     neighbors_inds = []
     try:
-
-        if offspring[i-1][j] > 0:
-            neighbors.append(mat[i-1][j])
-            neighbors_inds.append((i-1, j))
+        if not((i - 1) < 0):
+            if offspring[i-1][j] > 0:
+                neighbors.append(mat[i-1][j])
+                neighbors_inds.append((i-1, j))
     except:
         pass
 
 
     try:
-        if not((j - 1) < 0):
-            if offspring[i][j-1] > 0:
-                neighbors.append(mat[i][j-1])
-                neighbors_inds.append((i, j-1))
+
+        if offspring[i][j-1] > 0:
+            neighbors.append(mat[i][j-1])
+            neighbors_inds.append((i, j-1))
     except:
         pass
 
