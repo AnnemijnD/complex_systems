@@ -154,8 +154,8 @@ def mating(grids):
     grid, grid_a, grid_b = grids
 
     # Loop over variables to assign into mating pools
-    for i in range(len(grid)):
-        for j in range(len(grid[0])):
+    for j in range(len(grid)):
+        for i in range(len(grid[0])):
             p = np.random.uniform(0, 1)
             if grid_a[j][i] == 0 and grid_b[j][i] == 0:
                 S0 += 1
@@ -201,8 +201,8 @@ def mating(grids):
     # Loop over grid and create offspring matrix
     offspring_a = np.zeros((SIZE, SIZE))
     offspring_b = np.zeros((SIZE, SIZE))
-    for i in range(len(grid)):
-        for j in range(len(grid[0])):
+    for j in range(len(grid)):
+        for i in range(len(grid[0])):
 
             p = np.random.uniform(0, 1)
             if grid_a[j][i] == 0 & grid_b[j][i] == 0:
@@ -216,7 +216,7 @@ def mating(grids):
                     offspring_b[j][i] = 1
                 elif p < p1 + p2:
                     offspring_a[j][i] = 2
-                    offspring_b[j][i] = 2
+                    offspring_b[j][i] = 1
                 elif p < p1 + p2 + p3:
                     offspring_a[j][i] = 1
                     offspring_b[j][i] = 2
@@ -243,7 +243,7 @@ def mating(grids):
                 p1, p2, p3, p4 = p_matrix[2]
                 if p < p1:
                     offspring_a[j][i] = 2
-                    offspring_b[j][i] = 2
+                    offspring_b[j][i] = 1
                 elif p < p1 + p2:
                     offspring_a[j][i] = 1
                     offspring_b[j][i] = 1
