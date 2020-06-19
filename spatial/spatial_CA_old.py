@@ -89,8 +89,7 @@ def initialise(type="RANDOM"):
 
 
     elif type == "STRUCTURED":
-        grid_a = np.zeros((SIZE, SIZE))
-        grid_b = np.zeros((SIZE, SIZE))
+
         grid = np.zeros((SIZE, SIZE))
 
         if SIZE % 2 == 1:
@@ -102,12 +101,8 @@ def initialise(type="RANDOM"):
             for col in range(SIZE):
                 if row <= Hab1:
                     grid[row][col] = 1
-                    # grid_a[row][col] = 1
-                    # grid_b[row][col] = 1
                 else:
                     grid[row][col] = 2
-                    # grid_a[row][col] = 2
-                    # grid_b[row][col] = 2
 
     elif type == "NON_STRUCTURED":
         try:
@@ -117,22 +112,9 @@ def initialise(type="RANDOM"):
             grid = np.random.randint(low=1,high=3,size=(SIZE, SIZE))
             pickle.dump(grid, open(f"non_struct_habs/SIZE={SIZE}.p", "wb"))
 
-    # # create allele grids
+    # create allele grids
     grid_a = np.random.randint(low=1, high=3,size=(SIZE, SIZE))
     grid_b = np.random.randint(low=1, high=3,size=(SIZE, SIZE))
-
-    # grid_a = np.zeros((SIZE, SIZE))
-    # grid_b = np.zeros((SIZE, SIZE))
-    #
-    # for i in range(SIZE):
-    #     for j in range(SIZE):
-    #         p = np.random.uniform(0,1)
-    #         if p < 0.5:
-    #             grid_a[i][j] = 1
-    #             grid_b[i][j] = 1
-    #         else:
-    #             grid_a[i][j] = 2
-    #             grid_b[i][j] = 2
 
     # oeps toch een for loop
     for i in range(len(grid_a)):
@@ -142,7 +124,6 @@ def initialise(type="RANDOM"):
                 grid_a[i][j] = 0
                 grid_b[i][j] = 0
 
-    print(grid_a, grid_b)
     return grid, grid_a, grid_b
 
 def survival(grids):
@@ -179,9 +160,6 @@ def mating(grids):
     # Loop over variables to assign into mating pools
     for j in range(len(grid)):
         for i in range(len(grid[0])):
-            # print("a", grid_a[j][i])
-            # print("b", grid_b[j][i])
-
             p = np.random.uniform(0, 1)
             if grid_a[j][i] == 0 and grid_b[j][i] == 0:
                 S0 += 1
@@ -221,9 +199,8 @@ def mating(grids):
     SaB = (S1, S2, S1aB, S1AB, S1ab, S1Ab, S2aB, S2AB, S2ab, S2Ab)
     SAB = (S1, S2, S1AB, S1aB, S1Ab, S1ab, S2AB, S2aB, S2Ab, S2ab)
 
-    p_matrix = [probabilities(Sab, 1), probabilities(SaB, 2),
-                        probabilities(SAb, 1), probabilities(SAB,2)]
-
+    p_matrix = [probabilities(Sab), probabilities(SaB),
+                        probabilities(SAb), probabilities(SAB)]
 
     # Loop over grid and create offspring matrix
     offspring_a = np.zeros((SIZE, SIZE))
@@ -232,7 +209,7 @@ def mating(grids):
         for i in range(len(grid[0])):
 
             p = np.random.uniform(0, 1)
-            if grid_a[j][i] == 0 and grid_b[j][i] == 0:
+            if grid_a[j][i] == 0 & grid_b[j][i] == 0:
                 offspring_a[j][i] = 0
                 offspring_b[j][i] = 0
 
@@ -305,26 +282,18 @@ def mating(grids):
     return grids
 
 # Calculates probabilities
-def probabilities(S,b):
+def probabilities(S):
 
     # 0 = S1, 1 = S2, 2 = a1, 3 = b1, 4 = c1, 5 = d1, 6 = a2, 7 = b2, 8 = c2, 9 = d2
 
     try:
-        if b == 1:
-            p1 = ((MATING/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((1-MATING)/S[1])
-                  *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
-        else:
-            p1 = (((1- MATING)/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((MATING)/S[1])
-                  *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
-
+        p1 = ((MATING/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((1-MATING)/S[1])
+              *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
     except:
         p1 = 0
 
     try:
-        if b == 1:
-            p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
-        else:
-            p2 = ((1 - MATING)/(2*S[0]))*(S[3]+.5*S[5])+((MATING)/(2*S[1]))*(S[7]+.5*S[9])
+        p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
 
         # # new:
         # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
@@ -333,10 +302,7 @@ def probabilities(S,b):
         p2 = 0
 
     try:
-        if b == 1:
-            p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
-        else:
-            p3 = ((1 - MATING)/(2*S[0]))*(S[4]+.5*S[5])+((MATING)/(2*S[1]))*(S[8]+.5*S[9])
+        p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
 
         # #new:
         # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
@@ -344,10 +310,7 @@ def probabilities(S,b):
         p3 = 0
 
     try:
-        if b == 1:
-            p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
-        else:
-            p4 = ((1 - MATING)/(4*S[0]))*(S[5]) + ((MATING)/(4*S[0]))*(S[9])
+        p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
     except:
         p4 = 0
 
@@ -532,7 +495,10 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     plt.plot(x , type_2 , label="aB")
     plt.plot(x , type_3 , label="Ab")
     plt.plot(x , type_4 , label="AB")
-
+    # plt.plot(x[:100], type_1[:100], label="ab")
+    # plt.plot(x[:100], type_2[:100], label="aB")
+    # plt.plot(x[:100], type_3[:100], label="Ab")
+    # plt.plot(x[:100], type_4[:100], label="AB")
     plt.legend()
     plt.show()
 
