@@ -20,6 +20,9 @@ EMPTY_CELLS = 0.2
 global GRID_TYPE
 GRID_TYPE = "RANDOM"
 
+global ERROR
+ERROR = 0.05
+
 
 def rand_neumann(mat, i, j, offspring):
     """
@@ -281,19 +284,28 @@ def mating(grids):
 # Calculates probabilities
 def probabilities(S):
 
+    # 0 = S1, 1 = S2, 2 = a1, 3 = b1, 4 = c1, 5 = d1, 6 = a2, 7 = b2, 8 = c2, 9 = d2
+
     try:
-        p1 = ((MATING/S[0])*(S[2]+.5*S[3]+.5*S[4]+.25*S[5])+((1-MATING)/S[1])
+        p1 = ((MATING/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((1-MATING)/S[1])
               *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
     except:
         p1 = 0
 
     try:
         p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+
+        # # new:
+        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
     except:
         p2 = 0
 
     try:
         p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        # #new:
+        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
     except:
         p3 = 0
 
@@ -438,6 +450,10 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         # keep up data for the plots
         unique, counts = np.unique(figure, return_counts=True)
         freqs = np.asarray((unique, counts)).T
+        # print("fig", figure)
+        # print("freqs", freqs)
+        # print("grida", grid_a)
+        # print("gridb", grid_b)
         el_0 = 0
         el_1 = 0
         el_2 = 0
@@ -466,6 +482,9 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         ld = linkage_diseq(ld_counts)
         ld_array.append(ld)
 
+        if abs(ld - 0.25) < ERROR:
+            print(f"SPECIATION! Time= {i}")
+
     # mkake figure
     figure = make_figure(grids)
     x = list(range(iterations))
@@ -473,9 +492,13 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
 
     # make freq plots
     plt.plot(x, type_1, label="ab")
-    plt.plot(x, type_2, label="aB")
-    plt.plot(x, type_3, label="Ab")
-    plt.plot(x, type_4, label="AB")
+    plt.plot(x , type_2 , label="aB")
+    plt.plot(x , type_3 , label="Ab")
+    plt.plot(x , type_4 , label="AB")
+    # plt.plot(x[:100], type_1[:100], label="ab")
+    # plt.plot(x[:100], type_2[:100], label="aB")
+    # plt.plot(x[:100], type_3[:100], label="Ab")
+    # plt.plot(x[:100], type_4[:100], label="AB")
     plt.legend()
     plt.show()
 

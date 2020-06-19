@@ -17,4 +17,4 @@ Optional arguments:
 
 
 
-model.run_model(2000, size=20,survive={1:0.8, 2:0.8}, p=0.85, empty=0.2, grid_type="STRUCTURED")
+model.run_model(20000, size=50,survive={1:0.8, 2:0.8}, p=1, empty=0.2, grid_type="STRUCTURED")
