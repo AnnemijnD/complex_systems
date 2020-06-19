@@ -525,7 +525,8 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     # mkake figure
     figure = make_figure(grids)
     x = list(range(iterations))
-
+    sns.heatmap(grids[0])
+    plt.show()
 
     # make freq plots
     plt.plot(x, type_1, label="ab")
