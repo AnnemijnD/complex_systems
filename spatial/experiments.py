@@ -18,4 +18,4 @@ Optional arguments:
 
 
 # model.run_model(20000, size=50,survive={1:0.8, 2:0.8}, p=1, empty=0.2, grid_type="STRUCTURED")
-model.run_model(10000, size=50, grid_type="STRUCTURED", p=1, survive={1:0.6, 2:0.6}, empty=0)
+model.run_model(20000, size=50, grid_type="NON_STRUCTURED", p=0.8, survive={1:0.85, 2:0.85}, empty=0)

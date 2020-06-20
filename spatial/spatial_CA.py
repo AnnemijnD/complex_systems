@@ -142,7 +142,6 @@ def initialise(type="RANDOM"):
                 grid_a[i][j] = 0
                 grid_b[i][j] = 0
 
-    print(grid_a, grid_b)
     return grid, grid_a, grid_b
 
 def survival(grids):
@@ -468,9 +467,11 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
 
     # holds all linkage diseq. vals
     ld_array = []
-
-    prints = [100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500]
+    i_s = 0
+    prints = [100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,5000,
+                5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000-1]
     for i in range(iterations):
+        i_s +=1
         if i in prints:
             print(i)
         grids = survival(grids)
@@ -513,26 +514,37 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         type_2.append(el_2)
         type_3.append(el_3)
         type_4.append(el_4)
+        if el_0 == SIZE**2:
+            break
 
         # calculate ld and add to array
         ld_counts = [el_0, el_1, el_2, el_3, el_4]
         ld = linkage_diseq(ld_counts)
         ld_array.append(ld)
 
-        if abs(ld - 0.25) < ERROR:
-            print(f"SPECIATION! Time= {i}")
+        # if abs(ld - 0.25) < ERROR:
+        #     print(f"SPECIATION! Time= {i}")
+
+        # if el_1 == 0 and el_4 == 0:
+        #     print("SPECIATION",i)
+        # elif el_2 == 0 and el_3 == 0:
+        #     print("SPECIATION",i)
+        # else:
+        #     print("NO LONGER SPECIATION")
+        #
 
     # mkake figure
     figure = make_figure(grids)
-    x = list(range(iterations))
-    sns.heatmap(grids[0])
-    plt.show()
+    x = list(range(i_s))
+
 
     # make freq plots
     plt.plot(x, type_1, label="ab")
     plt.plot(x , type_2 , label="aB")
     plt.plot(x , type_3 , label="Ab")
     plt.plot(x , type_4 , label="AB")
+    plt.title(f"{GRID_TYPE}, n={iterations}, p={MATING}, s={SURVIVAL}")
+
 
     plt.legend()
     plt.show()
