@@ -6,6 +6,7 @@ import matplotlib.colors as mcolors
 # import numba
 import pickle
 global SIZE
+import os
 SIZE = 50
 
 global SURVIVAL
@@ -111,11 +112,11 @@ def initialise(type="RANDOM"):
 
     elif type == "NON_STRUCTURED":
         try:
-            grid = pickle.load(open(f"non_struct_habs/SIZE={SIZE}.p", "rb"))
+            grid = pickle.load(open(os.path.join("spatial", "non_struct_habs", f"SIZE={SIZE}.p"), "wb"))
 
         except:
             grid = np.random.randint(low=1,high=3,size=(SIZE, SIZE))
-            pickle.dump(grid, open(f"non_struct_habs/SIZE={SIZE}.p", "wb"))
+            pickle.dump(grid, open(os.path.join("spatial", "non_struct_habs", f"SIZE={SIZE}.p"), "wb"))
 
     # # create allele grids
     grid_a = np.random.randint(low=1, high=3,size=(SIZE, SIZE))
@@ -304,11 +305,63 @@ def mating(grids):
     return grids
 
 # Calculates probabilities
-def probabilities(S,b):
+def probabilities(S, b):
 
     # 0 = S1, 1 = S2, 2 = a1, 3 = b1, 4 = c1, 5 = d1, 6 = a2, 7 = b2, 8 = c2, 9 = d2
+    if S[0] == 0 and S[1] == 0:
+        p1, p2, p3, p4 = 0, 0, 0, 0
+    elif S[0] == 0 and S[1] > 0:
+        if b == 1:
+            p1 = ((1-MATING)/S[1]) * (S[6]+.5*S[7]+.5*S[8]+.25*S[9])
+        else:
+            p1 = ((MATING)/S[1]) * (S[6]+.5*S[7]+.5*S[8]+.25*S[9])
 
-    try:
+        if b == 1:
+            p2 = ((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+        else:
+            p2 = ((MATING)/(2*S[1]))*(S[7]+.5*S[9])
+
+        # # new:
+        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        if b == 1:
+            p3 = ((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+        else:
+            p3 = ((MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        # #new:
+        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+
+        p4 = 0
+
+    elif S[1] == 0:
+        if b == 1:
+            p1 = (MATING/S[0]) * (S[2]+.5*S[3] + .5*S[4]+.25*S[5])
+        else:
+            p1 = ((1- MATING)/S[0]) * (S[2]+.5*S[3] + .5*S[4]+.25*S[5])
+
+        if b == 1:
+            p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])
+        else:
+            p2 = ((1 - MATING)/(2*S[0]))*(S[3]+.5*S[5])
+
+        # # new:
+        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        if b == 1:
+            p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])
+        else:
+            p3 = ((1 - MATING)/(2*S[0]))*(S[4]+.5*S[5])
+
+        # #new:
+        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+
+        if b == 1:
+            p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
+        else:
+            p4 = ((1 - MATING)/(4*S[0]))*(S[5]) + ((MATING)/(4*S[0]))*(S[9])
+
+    else:
         if b == 1:
             p1 = ((MATING/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((1-MATING)/S[1])
                   *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
@@ -316,10 +369,6 @@ def probabilities(S,b):
             p1 = (((1- MATING)/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((MATING)/S[1])
                   *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
 
-    except:
-        p1 = 0
-
-    try:
         if b == 1:
             p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
         else:
@@ -328,10 +377,6 @@ def probabilities(S,b):
         # # new:
         # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
 
-    except:
-        p2 = 0
-
-    try:
         if b == 1:
             p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
         else:
@@ -339,16 +384,11 @@ def probabilities(S,b):
 
         # #new:
         # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
-    except:
-        p3 = 0
 
-    try:
         if b == 1:
             p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
         else:
             p4 = ((1 - MATING)/(4*S[0]))*(S[5]) + ((MATING)/(4*S[0]))*(S[9])
-    except:
-        p4 = 0
 
     return p1, p2, p3, p4
 
@@ -401,7 +441,7 @@ def dispersal(grids):
     grids = [grid, grid_a, grid_b]
     return grids
 
-def make_figure(grids, plot=True):
+def make_figure(grids, z=1, plot=True, save=False):
 
     grid, grid_a, grid_b = grids
 
@@ -421,10 +461,14 @@ def make_figure(grids, plot=True):
                 elif grid_b[row][col] == 2:
                     figure[row][col] = 4
     if plot:
+        figure1 = plt.figure()
         norm = plt.Normalize(0,4)
         cmap = mcolors.LinearSegmentedColormap.from_list("n",['#FFFFFF','#20639B','#3CAEA3','#F6D55C','#ED553B'])
         sns.heatmap(figure, clim=(0, 4),cmap=cmap, norm=norm, vmin=0, vmax=4)
-        plt.show()
+        if not save:
+            plt.savefig(f"spatial\\plots\\fig1_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
+        else:
+            plt.show()
 
     return figure
 
@@ -440,7 +484,7 @@ def linkage_diseq(counts):
     return ld
 
 
-def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS, grid_type=GRID_TYPE):
+def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS, grid_type=GRID_TYPE, plot=True, z=1):
 # Redefine global variables when specified
     global SIZE
     SIZE = size
@@ -483,7 +527,7 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         grids = dispersal(grids)
 
         grid, grid_a, grid_b = grids
-        figure = make_figure(grids, plot=False)
+        figure = make_figure(grids, z, plot=False)
 
         # keep up data for the plots
         unique, counts = np.unique(figure, return_counts=True)
@@ -534,11 +578,12 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         #
 
     # mkake figure
-    figure = make_figure(grids)
+    figure1 = make_figure(grids, plot=True, save=plot)
     x = list(range(i_s))
 
 
     # make freq plots
+    figure2 = plt.figure()
     plt.plot(x, type_1, label="ab")
     plt.plot(x , type_2 , label="aB")
     plt.plot(x , type_3 , label="Ab")
@@ -547,9 +592,16 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
 
 
     plt.legend()
-    plt.show()
+    if plot:
+        plt.show()
+    else:
+        plt.savefig(f"spatial\\plots\\fig2_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
 
+    figure3 = plt.figure()
     plt.plot(ld_array)
-    plt.show()
+    if plot:
+        plt.show()
+    else:
+        plt.savefig(f"spatial\\plots\\fig3_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
 
-    return figure
+    return figure1, figure2, figure3
