@@ -143,7 +143,6 @@ def initialise(type="RANDOM"):
                 grid_a[i][j] = 0
                 grid_b[i][j] = 0
 
-    print(grid_a, grid_b)
     return grid, grid_a, grid_b
 
 def survival(grids):
@@ -403,7 +402,7 @@ def dispersal(grids):
     grids = [grid, grid_a, grid_b]
     return grids
 
-def make_figure(grids, z, plot=True):
+def make_figure(grids, z=1, plot=True, save=False):
 
     grid, grid_a, grid_b = grids
 
@@ -427,7 +426,10 @@ def make_figure(grids, z, plot=True):
         norm = plt.Normalize(0,4)
         cmap = mcolors.LinearSegmentedColormap.from_list("n",['#FFFFFF','#20639B','#3CAEA3','#F6D55C','#ED553B'])
         sns.heatmap(figure, clim=(0, 4),cmap=cmap, norm=norm, vmin=0, vmax=4)
-        plt.savefig(f"fig1_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
+        if not save:
+            plt.savefig(f"spatial\\plots\\fig1_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
+        else:
+            plt.show()
 
     return figure
 
@@ -443,7 +445,7 @@ def linkage_diseq(counts):
     return ld
 
 
-def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS, grid_type=GRID_TYPE, z=1):
+def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS, grid_type=GRID_TYPE, plot=True, z=1):
 # Redefine global variables when specified
     global SIZE
     SIZE = size
@@ -470,9 +472,11 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
 
     # holds all linkage diseq. vals
     ld_array = []
-
-    prints = [100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 10000, 15000, 20000, 25000, 30000]
+    i_s = 0
+    prints = [100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,5000,
+                5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000-1]
     for i in range(iterations):
+        i_s +=1
         if i in prints:
             print(i)
         grids = survival(grids)
@@ -515,18 +519,28 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         type_2.append(el_2)
         type_3.append(el_3)
         type_4.append(el_4)
+        if el_0 == SIZE**2:
+            break
 
         # calculate ld and add to array
         ld_counts = [el_0, el_1, el_2, el_3, el_4]
         ld = linkage_diseq(ld_counts)
         ld_array.append(ld)
 
-        if abs(ld - 0.25) < ERROR:
-            print(f"SPECIATION! Time= {i}")
+        # if abs(ld - 0.25) < ERROR:
+        #     print(f"SPECIATION! Time= {i}")
+
+        # if el_1 == 0 and el_4 == 0:
+        #     print("SPECIATION",i)
+        # elif el_2 == 0 and el_3 == 0:
+        #     print("SPECIATION",i)
+        # else:
+        #     print("NO LONGER SPECIATION")
+        #
 
     # mkake figure
-    figure1 = make_figure(grids, z)
-    x = list(range(iterations))
+    figure1 = make_figure(grids, plot=True, save=plot)
+    x = list(range(i_s))
 
 
     # make freq plots
@@ -535,12 +549,20 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     plt.plot(x , type_2 , label="aB")
     plt.plot(x , type_3 , label="Ab")
     plt.plot(x , type_4 , label="AB")
+    plt.title(f"{GRID_TYPE}, n={iterations}, p={MATING}, s={SURVIVAL}")
+
 
     plt.legend()
-    plt.savefig(f"fig2_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
+    if plot:
+        plt.show()
+    else:
+        plt.savefig(f"spatial\\plots\\fig2_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
 
     figure3 = plt.figure()
     plt.plot(ld_array)
-    plt.savefig(f"fig3_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
+    if plot:
+        plt.show()
+    else:
+        plt.savefig(f"spatial\\plots\\fig3_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
 
     return figure1, figure2, figure3
