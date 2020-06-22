@@ -305,11 +305,63 @@ def mating(grids):
     return grids
 
 # Calculates probabilities
-def probabilities(S,b):
+def probabilities(S, b):
 
     # 0 = S1, 1 = S2, 2 = a1, 3 = b1, 4 = c1, 5 = d1, 6 = a2, 7 = b2, 8 = c2, 9 = d2
+    if S[0] == 0 and S[1] == 0:
+        p1, p2, p3, p4 = 0, 0, 0, 0
+    elif S[0] == 0 and S[1] > 0:
+        if b == 1:
+            p1 = ((1-MATING)/S[1]) * (S[6]+.5*S[7]+.5*S[8]+.25*S[9])
+        else:
+            p1 = ((MATING)/S[1]) * (S[6]+.5*S[7]+.5*S[8]+.25*S[9])
 
-    try:
+        if b == 1:
+            p2 = ((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+        else:
+            p2 = ((MATING)/(2*S[1]))*(S[7]+.5*S[9])
+
+        # # new:
+        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        if b == 1:
+            p3 = ((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+        else:
+            p3 = ((MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        # #new:
+        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+
+        p4 = 0
+
+    elif S[1] == 0:
+        if b == 1:
+            p1 = (MATING/S[0]) * (S[2]+.5*S[3] + .5*S[4]+.25*S[5])
+        else:
+            p1 = ((1- MATING)/S[0]) * (S[2]+.5*S[3] + .5*S[4]+.25*S[5])
+
+        if b == 1:
+            p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])
+        else:
+            p2 = ((1 - MATING)/(2*S[0]))*(S[3]+.5*S[5])
+
+        # # new:
+        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        if b == 1:
+            p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])
+        else:
+            p3 = ((1 - MATING)/(2*S[0]))*(S[4]+.5*S[5])
+
+        # #new:
+        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+
+        if b == 1:
+            p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
+        else:
+            p4 = ((1 - MATING)/(4*S[0]))*(S[5]) + ((MATING)/(4*S[0]))*(S[9])
+
+    else:
         if b == 1:
             p1 = ((MATING/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((1-MATING)/S[1])
                   *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
@@ -317,10 +369,6 @@ def probabilities(S,b):
             p1 = (((1- MATING)/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((MATING)/S[1])
                   *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
 
-    except:
-        p1 = 0
-
-    try:
         if b == 1:
             p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
         else:
@@ -329,10 +377,6 @@ def probabilities(S,b):
         # # new:
         # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
 
-    except:
-        p2 = 0
-
-    try:
         if b == 1:
             p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
         else:
@@ -340,16 +384,11 @@ def probabilities(S,b):
 
         # #new:
         # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
-    except:
-        p3 = 0
 
-    try:
         if b == 1:
             p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
         else:
             p4 = ((1 - MATING)/(4*S[0]))*(S[5]) + ((MATING)/(4*S[0]))*(S[9])
-    except:
-        p4 = 0
 
     return p1, p2, p3, p4
 
