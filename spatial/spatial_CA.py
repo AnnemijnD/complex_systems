@@ -6,6 +6,7 @@ import matplotlib.colors as mcolors
 # import numba
 import pickle
 global SIZE
+import os
 SIZE = 50
 
 global SURVIVAL
@@ -111,11 +112,11 @@ def initialise(type="RANDOM"):
 
     elif type == "NON_STRUCTURED":
         try:
-            grid = pickle.load(open(f"non_struct_habs/SIZE={SIZE}.p", "rb"))
+            grid = pickle.load(open(os.path.join("spatial", "non_struct_habs", f"SIZE={SIZE}.p"), "wb"))
 
         except:
             grid = np.random.randint(low=1,high=3,size=(SIZE, SIZE))
-            pickle.dump(grid, open(f"non_struct_habs/SIZE={SIZE}.p", "wb"))
+            pickle.dump(grid, open(os.path.join("spatial", "non_struct_habs", f"SIZE={SIZE}.p"), "wb"))
 
     # # create allele grids
     grid_a = np.random.randint(low=1, high=3,size=(SIZE, SIZE))
@@ -402,7 +403,7 @@ def dispersal(grids):
     grids = [grid, grid_a, grid_b]
     return grids
 
-def make_figure(grids, plot=True):
+def make_figure(grids, z, plot=True):
 
     grid, grid_a, grid_b = grids
 
@@ -422,10 +423,11 @@ def make_figure(grids, plot=True):
                 elif grid_b[row][col] == 2:
                     figure[row][col] = 4
     if plot:
+        figure1 = plt.figure()
         norm = plt.Normalize(0,4)
         cmap = mcolors.LinearSegmentedColormap.from_list("n",['#FFFFFF','#20639B','#3CAEA3','#F6D55C','#ED553B'])
         sns.heatmap(figure, clim=(0, 4),cmap=cmap, norm=norm, vmin=0, vmax=4)
-        plt.show()
+        plt.savefig(f"fig1_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
 
     return figure
 
@@ -441,7 +443,7 @@ def linkage_diseq(counts):
     return ld
 
 
-def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS, grid_type=GRID_TYPE):
+def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS, grid_type=GRID_TYPE, z=1):
 # Redefine global variables when specified
     global SIZE
     SIZE = size
@@ -469,7 +471,7 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     # holds all linkage diseq. vals
     ld_array = []
 
-    prints = [100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500]
+    prints = [100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 10000, 15000, 20000, 25000, 30000]
     for i in range(iterations):
         if i in prints:
             print(i)
@@ -482,7 +484,7 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         grids = dispersal(grids)
 
         grid, grid_a, grid_b = grids
-        figure = make_figure(grids, plot=False)
+        figure = make_figure(grids, z, plot=False)
 
         # keep up data for the plots
         unique, counts = np.unique(figure, return_counts=True)
@@ -523,20 +525,22 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
             print(f"SPECIATION! Time= {i}")
 
     # mkake figure
-    figure = make_figure(grids)
+    figure1 = make_figure(grids, z)
     x = list(range(iterations))
 
 
     # make freq plots
+    figure2 = plt.figure()
     plt.plot(x, type_1, label="ab")
     plt.plot(x , type_2 , label="aB")
     plt.plot(x , type_3 , label="Ab")
     plt.plot(x , type_4 , label="AB")
 
     plt.legend()
-    plt.show()
+    plt.savefig(f"fig2_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
 
+    figure3 = plt.figure()
     plt.plot(ld_array)
-    plt.show()
+    plt.savefig(f"fig3_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
 
-    return figure
+    return figure1, figure2, figure3
