@@ -3,7 +3,9 @@ import random
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 import matplotlib.colors as mcolors
+from pathlib import Path
 # import numba
+import time
 import pickle
 global SIZE
 SIZE = 50
@@ -302,14 +304,15 @@ def mating(grids):
     # print(mat_off_b, "matoffb")
     grids.append(mat_off_a)
     grids.append(mat_off_b)
-    print(mat_off_a)
-    print(mat_off_b)
-    
+
+
     return grids
 def mate(grids, inds, row, col):
     S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB, S0 = 0, 0, 0, 0, 0, 0, 0, 0, 0
     grid, grid_a, grid_b = grids
-    # inds.append((row, col))
+
+    inds.append((row, col))
+
     # print("inds:", inds)
     # print(row, col)
     # print(grid_a, "gra")
@@ -352,9 +355,12 @@ def mate(grids, inds, row, col):
             else:
                 S1AB += 1
 
+
     # Total mating pool sizes
     S1 = S1ab + S1Ab + S1aB + S1AB
     S2 = S2ab + S2Ab + S2aB + S2AB
+
+    # print(S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB, S0, S1, S2)
 
     # Rearrange S variables to permute for the probabilities formula
     Sab = (S1, S2, S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB)
@@ -362,16 +368,19 @@ def mate(grids, inds, row, col):
     SaB = (S1, S2, S1aB, S1AB, S1ab, S1Ab, S2aB, S2AB, S2ab, S2Ab)
     SAB = (S1, S2, S1AB, S1aB, S1Ab, S1ab, S2AB, S2aB, S2Ab, S2ab)
 
-    p_matrix = [probabilities(Sab, 1), probabilities(SaB, 2),
-                        probabilities(SAb, 1), probabilities(SAB,2)]
-    # print("pmat", p_matrix)
+    p_matrix = np.array([probabilities(Sab, 1), probabilities(SaB, 2),
+                        probabilities(SAb, 1), probabilities(SAB,2)])
+
+    for i in range(len(p_matrix)):
+        n = np.sum(p_matrix[i])
+        if not n == 0:
+            p_matrix[i] = p_matrix[i]/n
 
 
     # Loop over grid and create offspring matrix
 
 
     p = np.random.uniform(0, 1)
-    # print("p", p)
 
 
     offspring_a = 0
@@ -444,14 +453,65 @@ def mate(grids, inds, row, col):
     # print("chosen: ", offspring_a, offspring_b)
     # offspring_a = np.array([[0,0,1], [0,0,2], [2,1,0]])
     # offspring_b = np.array([[0,0,1], [0,0,1], [1,1,0]])
-
     return offspring_a, offspring_b
 # Calculates probabilities
-def probabilities(S,b):
+def probabilities(S, b):
 
     # 0 = S1, 1 = S2, 2 = a1, 3 = b1, 4 = c1, 5 = d1, 6 = a2, 7 = b2, 8 = c2, 9 = d2
+    if S[0] == 0 and S[1] == 0:
+        p1, p2, p3, p4 = 0, 0, 0, 0
+    elif S[0] == 0 and S[1] > 0:
+        if b == 1:
+            p1 = ((1-MATING)/S[1]) * (S[6]+.5*S[7]+.5*S[8]+.25*S[9])
+        else:
+            p1 = ((MATING)/S[1]) * (S[6]+.5*S[7]+.5*S[8]+.25*S[9])
 
-    try:
+        if b == 1:
+            p2 = ((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+        else:
+            p2 = ((MATING)/(2*S[1]))*(S[7]+.5*S[9])
+
+        # # new:
+        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        if b == 1:
+            p3 = ((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+        else:
+            p3 = ((MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        # #new:
+        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+
+        p4 = 0
+
+    elif S[1] == 0:
+        if b == 1:
+            p1 = (MATING/S[0]) * (S[2]+.5*S[3] + .5*S[4]+.25*S[5])
+        else:
+            p1 = ((1- MATING)/S[0]) * (S[2]+.5*S[3] + .5*S[4]+.25*S[5])
+
+        if b == 1:
+            p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])
+        else:
+            p2 = ((1 - MATING)/(2*S[0]))*(S[3]+.5*S[5])
+
+        # # new:
+        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        if b == 1:
+            p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])
+        else:
+            p3 = ((1 - MATING)/(2*S[0]))*(S[4]+.5*S[5])
+
+        # #new:
+        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+
+        if b == 1:
+            p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
+        else:
+            p4 = ((1 - MATING)/(4*S[0]))*(S[5]) + ((MATING)/(4*S[0]))*(S[9])
+
+    else:
         if b == 1:
             p1 = ((MATING/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((1-MATING)/S[1])
                   *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
@@ -459,10 +519,6 @@ def probabilities(S,b):
             p1 = (((1- MATING)/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((MATING)/S[1])
                   *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
 
-    except:
-        p1 = 0
-
-    try:
         if b == 1:
             p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
         else:
@@ -471,10 +527,6 @@ def probabilities(S,b):
         # # new:
         # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
 
-    except:
-        p2 = 0
-
-    try:
         if b == 1:
             p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
         else:
@@ -482,16 +534,11 @@ def probabilities(S,b):
 
         # #new:
         # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
-    except:
-        p3 = 0
 
-    try:
         if b == 1:
             p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
         else:
             p4 = ((1 - MATING)/(4*S[0]))*(S[5]) + ((MATING)/(4*S[0]))*(S[9])
-    except:
-        p4 = 0
 
     return p1, p2, p3, p4
 
@@ -512,7 +559,9 @@ def dispersal(grids):
                 for r in range(R+1):
                     if r == 0:
                         continue
-                    neighbors_inds += rand_neumann_off(grid_a, row, col, offspring_a,r)
+                    neighbors_inds += rand_neumann_off(grid, row, col, offspring_a,r)
+
+
 
                 # als maar 1 neighbor: plaats deze in de cel
                 if len(neighbors_inds) == 1:
@@ -621,6 +670,7 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     # holds all linkage diseq. vals
     ld_array = []
     i_s = 0
+    figures = []
     prints = [100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,5000,
                 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000-1]
     for i in range(iterations):
@@ -628,28 +678,29 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         if i in prints:
             print(i)
         grids = survival(grids)
-        print("SRUVIVAL")
-        if iterations - i <= 10:
-            figure = make_figure(grids, plot=True)
-        else:
-            figure = make_figure(grids, plot=False)
+        # print("SRUVIVAL")
+        # if iterations - i <= 5:
+        #     figure = make_figure(grids, plot=True)
+        # else:
+        #     figure = make_figure(grids, plot=False)
         # let op, output hier zijn 5 elementen
         grids = mating(grids)
-        print("MAtign")
-        if iterations - i <= 10:
-            figure = make_figure([grids[0], grids[1], grids[2]], plot=True)
-        else:
-            figure = make_figure([grids[0], grids[1], grids[2]], plot=False)
+        # print("MAtign")
+        # if iterations - i <= 5:
+        #     figure = make_figure([grids[0], grids[1], grids[2]], plot=True)
+        # else:
+        #     figure = make_figure([grids[0], grids[1], grids[2]], plot=False)
 
         # en hier weer 3
         grids = dispersal(grids)
-        print("disp")
-
+        # print("disp")
+        #
         grid, grid_a, grid_b = grids
-        if iterations - i <= 10:
-            figure = make_figure(grids, plot=True)
-        else:
-            figure = make_figure(grids, plot=False)
+        # if iterations - i <= 5:
+        #     figure = make_figure(grids, plot=True)
+        # else:
+        figure = make_figure(grids, plot=False)
+        figures.append(figure)
 
         # keep up data for the plots
         unique, counts = np.unique(figure, return_counts=True)
@@ -660,6 +711,7 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         el_2 = 0
         el_3 = 0
         el_4 = 0
+
         for j in freqs:
 
             if j[0] == 0:
@@ -697,22 +749,27 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         #
 
     # mkake figure
-    figure = make_figure(grids)
+    figure = make_figure(grids, plot=False)
     x = list(range(i_s))
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    # try:
+    Path(f"/Users/annemijndijkhuis/Documents/Computational Science/Complex systems sims/complex_systems/spatial/data/allo/s={SURVIVAL}").mkdir(parents=True, exist_ok=True)
 
-
-    # make freq plots
-    plt.plot(x, type_1, label="ab")
-    plt.plot(x , type_2 , label="aB")
-    plt.plot(x , type_3 , label="Ab")
-    plt.plot(x , type_4 , label="AB")
-    plt.title(f"{GRID_TYPE}, n={iterations}, p={MATING}, s={SURVIVAL}")
-
-
-    plt.legend()
-    plt.show()
-
-    plt.plot(ld_array)
-    plt.show()
+    pickle.dump([x, type_1, type_2, type_3, type_4, ld_array, figures],
+    open(f"data/allo/s={SURVIVAL}/n={iterations}_p={MATING}_{timestr}.p", "wb"))
+    #
+    # # make freq plots
+    # plt.plot(x, type_1, label="ab")
+    # plt.plot(x , type_2 , label="aB")
+    # plt.plot(x , type_3 , label="Ab")
+    # plt.plot(x , type_4 , label="AB")
+    # plt.title(f"{GRID_TYPE}, n={iterations}, p={MATING}, s={SURVIVAL}")
+    #
+    #
+    # plt.legend()
+    # plt.show()
+    #
+    # plt.plot(ld_array)
+    # plt.show()
 
     return figure
