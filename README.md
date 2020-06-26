@@ -6,3 +6,6 @@ To recreate the results from our first model, run 'experiments.py MODEL TYPE'. F
 
 SYMPATRIC: 5 models, running time approximately 15min. Four different model evolutions + 1 speciation time plot.
 ALLOPATRIC: x models, running time approximately x min. 
+
+## MODEL 2: MUTATION
+
