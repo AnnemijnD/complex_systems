@@ -107,7 +107,7 @@ else:
             iterations = 5
             for i in range(iterations):
                 print(f"Running iterations {i} out of {iterations}")
-                x, type_1, type_2, type_3, type_4, ld_array, figures = allo_model.run_model(10, size=20, grid_type="STRUCTURED", empty=0, survive={1:0.95, 2:0.95}, p=0.5)
+                x, type_1, type_2, type_3, type_4, ld_array, figures = allo_model.run_model(5000, size=25, grid_type="STRUCTURED", empty=0, survive={1:0.95, 2:0.95}, p=0.5)
 
 
                 norm = plt.Normalize(0,4)
@@ -116,7 +116,36 @@ else:
                 plt.show()
 
 
-        elif sys.argv[1] == "SYMPATRIC" and sys.argv[2] == "CUSTOM":
+        elif sys.argv[1] == "ALLOPATRIC" and sys.argv[2] == "CUSTOM":
+            while True:
+                print("ENTER GRID SIZE (STANDARD is 25)")
+                try:
+                    size = int(input())
+                    break
+                except:
+                    print("INVALID INPUT")
+
+            while True:
+                print("ENTER # OF ITERATIONS (STANDARD is 5000)")
+                try:
+                    i = int(input())
+                    break
+                except:
+                    print("INVALID INPUT")
+
+            while True:
+                print("ENTER SURVIVAL PARAMETER S (0.5 < S < 1.0)")
+                try:
+                    x = float(input())
+                    if x >= 0.5 and x <= 1.0:
+                        break
+                except:
+                    print("INVALID INPUT")
 
 
-            pass
+            print("Running custom model...")
+            x, type_1, type_2, type_3, type_4, ld_array, figures = allo_model.run_model(i, size=size, empty=0, survive={1:x, 2:x}, p=0.5, grid_type="STRUCTURED")
+            norm = plt.Normalize(0,4)
+            cmap = mcolors.LinearSegmentedColormap.from_list("n",['#FFFFFF','#20639B','#3CAEA3','#F6D55C','#ED553B'])
+            sns.heatmap(figures[-1], clim=(0, 4),cmap=cmap, norm=norm, vmin=0, vmax=4)
+            plt.show()
