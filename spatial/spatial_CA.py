@@ -3,10 +3,11 @@ import random
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 import matplotlib.colors as mcolors
-# import numba
 import pickle
 global SIZE
 import os
+
+# Global Model Parameters
 SIZE = 50
 
 global SURVIVAL
@@ -25,7 +26,7 @@ global ERROR
 ERROR = 0.05
 
 
-def rand_neumann(mat, i, j, offspring):
+def rand_neumann(matrix, i, j, offspring):
     """
     Return a random neighbour from the neumann's neighbourhood.
     Only if neighbor has offspring.
@@ -36,7 +37,7 @@ def rand_neumann(mat, i, j, offspring):
     try:
         if not((i - 1) < 0):
             if offspring[i-1][j] > 0:
-                neighbors.append(mat[i-1][j])
+                neighbors.append(matrix[i-1][j])
                 neighbors_inds.append((i-1, j))
     except:
         pass
@@ -44,7 +45,7 @@ def rand_neumann(mat, i, j, offspring):
 
     try:
         if offspring[i][j-1] > 0:
-            neighbors.append(mat[i][j-1])
+            neighbors.append(matrix[i][j-1])
             neighbors_inds.append((i, j-1))
     except:
         pass
@@ -52,7 +53,7 @@ def rand_neumann(mat, i, j, offspring):
 
     try:
         if offspring[i+1][j] > 0:
-            neighbors.append(mat[i+1][j])
+            neighbors.append(matrix[i+1][j])
             neighbors_inds.append((i+1, j))
 
     except:
@@ -80,11 +81,8 @@ def initialise(type="RANDOM"):
         grid_b (2D matrix): Allele b grid
 
     """
-    # size = SIZE
 
-    # create grids randomly
-
-    # create habitat grid
+    # Create habitat grid
     if type == "RANDOM":
         grid = np.random.randint(low=1,high=3,size=(SIZE, SIZE))
 
@@ -103,12 +101,7 @@ def initialise(type="RANDOM"):
             for col in range(SIZE):
                 if row <= Hab1:
                     grid[row][col] = 1
-                    # grid_a[row][col] = 1
-                    # grid_b[row][col] = 1
-                else:
                     grid[row][col] = 2
-                    # grid_a[row][col] = 2
-                    # grid_b[row][col] = 2
 
     elif type == "NON_STRUCTURED":
         try:
@@ -118,24 +111,10 @@ def initialise(type="RANDOM"):
             grid = np.random.randint(low=1,high=3,size=(SIZE, SIZE))
             pickle.dump(grid, open(os.path.join("spatial", "non_struct_habs", f"SIZE={SIZE}.p"), "wb"))
 
-    # # create allele grids
+    # Create allele grids
     grid_a = np.random.randint(low=1, high=3,size=(SIZE, SIZE))
     grid_b = np.random.randint(low=1, high=3,size=(SIZE, SIZE))
 
-    # grid_a = np.zeros((SIZE, SIZE))
-    # grid_b = np.zeros((SIZE, SIZE))
-    #
-    # for i in range(SIZE):
-    #     for j in range(SIZE):
-    #         p = np.random.uniform(0,1)
-    #         if p < 0.5:
-    #             grid_a[i][j] = 1
-    #             grid_b[i][j] = 1
-    #         else:
-    #             grid_a[i][j] = 2
-    #             grid_b[i][j] = 2
-
-    # oeps toch een for loop
     for i in range(len(grid_a)):
         for j in range(len(grid_a[0])):
             r = np.random.uniform(0, 1)
@@ -144,6 +123,7 @@ def initialise(type="RANDOM"):
                 grid_b[i][j] = 0
 
     return grid, grid_a, grid_b
+
 
 def survival(grids):
     grid, grid_a, grid_b = grids
@@ -154,23 +134,22 @@ def survival(grids):
             if grid_a[i][j] == 0:
                 continue
 
-            # get chance
+            # Determince probability
             if not grid[i][j] == grid_a[i][j]:
                 chance = 1 - SURVIVAL[grid_a[i][j]]
             else:
                 chance = SURVIVAL[grid_a[i][j]]
 
-            # draw number
+            # Death with probability 1-chance
             r = np.random.uniform(0, 1)
-
-            # death event
             if r > chance:
                 grid_a[i][j] = 0
                 grid_b[i][j] = 0
 
     grids = [grid, grid_a, grid_b]
-    # print(make_figure(grids, plot=True))
+
     return grids
+
 
 def mating(grids):
     S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB, S0 = 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -179,8 +158,6 @@ def mating(grids):
     # Loop over variables to assign into mating pools
     for j in range(len(grid)):
         for i in range(len(grid[0])):
-            # print("a", grid_a[j][i])
-            # print("b", grid_b[j][i])
 
             p = np.random.uniform(0, 1)
             if grid_a[j][i] == 0 and grid_b[j][i] == 0:
@@ -296,12 +273,9 @@ def mating(grids):
                     offspring_a[j][i] = 1
                     offspring_b[j][i] = 1
 
-    # offspring_a = np.array([[0,0,1], [0,0,2], [2,1,0]])
-    # offspring_b = np.array([[0,0,1], [0,0,1], [1,1,0]])
-
-
     grids.append(offspring_a)
     grids.append(offspring_b)
+
     return grids
 
 # Calculates probabilities
@@ -321,16 +295,10 @@ def probabilities(S, b):
         else:
             p2 = ((MATING)/(2*S[1]))*(S[7]+.5*S[9])
 
-        # # new:
-        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
-
         if b == 1:
             p3 = ((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
         else:
             p3 = ((MATING)/(2*S[1]))*(S[8]+.5*S[9])
-
-        # #new:
-        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
 
         p4 = 0
 
@@ -374,16 +342,10 @@ def probabilities(S, b):
         else:
             p2 = ((1 - MATING)/(2*S[0]))*(S[3]+.5*S[5])+((MATING)/(2*S[1]))*(S[7]+.5*S[9])
 
-        # # new:
-        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
-
         if b == 1:
             p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
         else:
             p3 = ((1 - MATING)/(2*S[0]))*(S[4]+.5*S[5])+((MATING)/(2*S[1]))*(S[8]+.5*S[9])
-
-        # #new:
-        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
 
         if b == 1:
             p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
@@ -392,50 +354,51 @@ def probabilities(S, b):
 
     return p1, p2, p3, p4
 
-def dispersal(grids):
+
+def dispersal(grids, coordinates):
     """
     Places offspring in empty positions in the grid
     """
     grid, grid_a, grid_b, offspring_a, offspring_b = grids
 
-    for row in range(len(grid)):
-        for col in range(len(grid[0])):
+    for c in coordinates:
+        row, col = c
 
-            # vind lege cel
-            if grid_a[row][col] == 0:
+        # vind lege cel
+        if grid_a[row][col] == 0:
 
-                # get neighbors with offspring (von neumann)
-                neighbors_inds = rand_neumann(grid_a, row, col, offspring_a)
+            # get neighbors with offspring (von neumann)
+            neighbors_inds = rand_neumann(grid_a, row, col, offspring_a)
 
-                # als maar 1 neighbor: plaats deze in de cel
-                if len(neighbors_inds) == 1:
-                    neigh = neighbors_inds[0]
-                    x = neigh[0]
-                    y = neigh[1]
+            # als maar 1 neighbor: plaats deze in de cel
+            if len(neighbors_inds) == 1:
+                neigh = neighbors_inds[0]
+                x = neigh[0]
+                y = neigh[1]
 
-                    # plaats offspring in lege cel
-                    grid_a[row][col] = offspring_a[x][y]
-                    grid_b[row][col] = offspring_b[x][y]
+                # plaats offspring in lege cel
+                grid_a[row][col] = offspring_a[x][y]
+                grid_b[row][col] = offspring_b[x][y]
 
-                    # verwijder offspring
-                    offspring_a[x][y] = 0
-                    offspring_b[x][y] = 0
+                # verwijder offspring
+                offspring_a[x][y] = 0
+                offspring_b[x][y] = 0
 
 
-                # kies random offspring van de neigbors
-                elif not len(neighbors_inds) == 0:
-                    rand_ind = random.randint(0, len(neighbors_inds) - 1)
-                    chosen_neigh = neighbors_inds[rand_ind]
-                    x = chosen_neigh[0]
-                    y = chosen_neigh[1]
+            # kies random offspring van de neigbors
+            elif not len(neighbors_inds) == 0:
+                rand_ind = random.randint(0, len(neighbors_inds) - 1)
+                chosen_neigh = neighbors_inds[rand_ind]
+                x = chosen_neigh[0]
+                y = chosen_neigh[1]
 
-                    # plaats offspring in lege cel
-                    grid_a[row][col] = offspring_a[x][y]
-                    grid_b[row][col] = offspring_b[x][y]
+                # plaats offspring in lege cel
+                grid_a[row][col] = offspring_a[x][y]
+                grid_b[row][col] = offspring_b[x][y]
 
-                    # verwijder offspring
-                    offspring_a[x][y] = 0
-                    offspring_b[x][y] = 0
+                # verwijder offspring
+                offspring_a[x][y] = 0
+                offspring_b[x][y] = 0
 
 
     grids = [grid, grid_a, grid_b]
@@ -465,26 +428,25 @@ def make_figure(grids, z=1, plot=True, save=False):
         norm = plt.Normalize(0,4)
         cmap = mcolors.LinearSegmentedColormap.from_list("n",['#FFFFFF','#20639B','#3CAEA3','#F6D55C','#ED553B'])
         sns.heatmap(figure, clim=(0, 4),cmap=cmap, norm=norm, vmin=0, vmax=4)
+        plt.title(f"Spatial Grid: {SIZE}x{SIZE}; p = {MATING}; s = {SURVIVAL[1]}; e = {EMPTY_CELLS}; t = {GRID_TYPE}")
         if not save:
-            plt.savefig(f"spatial\\plots\\fig1_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
+            plt.savefig(f"spatial\\plots\\final_plots\\fig1_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
         else:
             plt.show()
 
     return figure
 
-# fake data
-# grid = np.array([[1,1,1], [2,1,2], [2,2,2]])
-# grid_a = np.array([[1,1,2], [0,0,2], [2,2,0]])
-# grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
 
+# Calculate linkage disequilibrium given population counts
 def linkage_diseq(counts):
     N4, N3, N1, N2, N0 = counts
     ld = ((N0*N3)-(N1*N2)) / ((SIZE**2 - N4)**2)
 
     return ld
 
+# Run model with given variables
+def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS, grid_type=GRID_TYPE, plot=True, break_at_speciation=False):
 
-def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CELLS, grid_type=GRID_TYPE, plot=True, z=1):
 # Redefine global variables when specified
     global SIZE
     SIZE = size
@@ -500,6 +462,7 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
 
     global GRID_TYPE
     GRID_TYPE = grid_type
+    
     # Initialise grid
     grid, grid_a, grid_b = initialise(GRID_TYPE)
     grids = [grid, grid_a, grid_b]
@@ -512,30 +475,32 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     # holds all linkage diseq. vals
     ld_array = []
     i_s = 0
-    prints = [100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,5000,
-                5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000-1]
+    q = 0
+
+    coordinates = []
+    for row in range(SIZE):
+        for col in range(SIZE):
+            coordinates.append((row, col))
+
     for i in range(iterations):
         i_s +=1
-        if i in prints:
+        if i % 1000 == 0:
             print(i)
         grids = survival(grids)
 
-        # let op, output hier zijn 5 elementen
+        # Careful, 5 output elements
         grids = mating(grids)
 
-        # en hier weer 3
-        grids = dispersal(grids)
+        # Back to 3 elements
+        random.shuffle(coordinates)
+        grids = dispersal(grids, coordinates)
 
         grid, grid_a, grid_b = grids
-        figure = make_figure(grids, z, plot=False)
+        figure = make_figure(grids, plot=False)
 
         # keep up data for the plots
         unique, counts = np.unique(figure, return_counts=True)
         freqs = np.asarray((unique, counts)).T
-        # print("fig", figure)
-        # print("freqs", freqs)
-        # print("grida", grid_a)
-        # print("gridb", grid_b)
         el_0 = 0
         el_1 = 0
         el_2 = 0
@@ -561,47 +526,44 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         if el_0 == SIZE**2:
             break
 
-        # calculate ld and add to array
+        # Calculate ld and add to array
         ld_counts = [el_0, el_1, el_2, el_3, el_4]
         ld = linkage_diseq(ld_counts)
+        if break_at_speciation:
+            if ld > 0.245 or ld < -0.245:
+                q += 1
+            if q == 1:
+                return i
         ld_array.append(ld)
 
-        # if abs(ld - 0.25) < ERROR:
-        #     print(f"SPECIATION! Time= {i}")
-
-        # if el_1 == 0 and el_4 == 0:
-        #     print("SPECIATION",i)
-        # elif el_2 == 0 and el_3 == 0:
-        #     print("SPECIATION",i)
-        # else:
-        #     print("NO LONGER SPECIATION")
-        #
-
-    # mkake figure
+    # Make figure
     figure1 = make_figure(grids, plot=True, save=plot)
     x = list(range(i_s))
 
 
-    # make freq plots
+    # Make freq plots
     figure2 = plt.figure()
     plt.plot(x, type_1, label="ab")
     plt.plot(x , type_2 , label="aB")
     plt.plot(x , type_3 , label="Ab")
     plt.plot(x , type_4 , label="AB")
-    plt.title(f"{GRID_TYPE}, n={iterations}, p={MATING}, s={SURVIVAL}")
+    plt.title(f"{GRID_TYPE}, n={iterations}, p={MATING}, s={SURVIVAL}; t = {GRID_TYPE}")
 
 
     plt.legend()
     if plot:
         plt.show()
     else:
-        plt.savefig(f"spatial\\plots\\fig2_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
+        plt.savefig(f"spatial\\plots\\final_plots\\fig2_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}.png")
 
     figure3 = plt.figure()
+    plt.xlabel("iterations")
+    plt.ylabel("LD")
+    plt.title(f"LD: {SIZE}x{SIZE}; p={MATING}; s={SURVIVAL[1]}; e={EMPTY_CELLS}; t = {GRID_TYPE}")
     plt.plot(ld_array)
     if plot:
         plt.show()
     else:
-        plt.savefig(f"spatial\\plots\\fig3_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
+        plt.savefig(f"spatial\\plots\\final_plots\\fig3_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}.png")
 
-    return figure1, figure2, figure3
+    return i
