@@ -713,12 +713,12 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     figure = make_figure(grids, plot=False)
     x = list(range(i_s))
     timestr = time.strftime("%Y%m%d-%H%M%S")
-    try:
-        Path(f"/Users/annemijndijkhuis/Documents/Computational Science/Complex systems sims/complex_systems/spatial/data/allo/s={SURVIVAL}").mkdir(parents=True, exist_ok=True)
-
-        pickle.dump([x, type_1, type_2, type_3, type_4, ld_array, figures],
-        open(f"data/allo/s={SURVIVAL}/n={iterations}_p={MATING}_{timestr}.p", "wb"))
-    except:
-        pass
+    # try:
+    #     Path(f"/Users/annemijndijkhuis/Documents/Computational Science/Complex systems sims/complex_systems/spatial/data/allo/s={SURVIVAL}").mkdir(parents=True, exist_ok=True)
+    #
+    #     pickle.dump([x, type_1, type_2, type_3, type_4, ld_array, figures],
+    #     open(f"data/allo/s={SURVIVAL}/n={iterations}_p={MATING}_{timestr}.p", "wb"))
+    # except:
+    #     pass
 
     return [x, type_1, type_2, type_3, type_4, ld_array, figures]
