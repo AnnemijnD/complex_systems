@@ -3,8 +3,11 @@ import random
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
 import matplotlib.colors as mcolors
-# import numba
+from pathlib import Path
+import time
 import pickle
+
+
 global SIZE
 SIZE = 50
 
@@ -91,12 +94,6 @@ def rand_neumann_off(mat, i, j, offspring,r):
 
     neighbors = []
     neighbors_inds = []
-    # print("----")
-    # print(mat, "mat")
-    # print(i, j)
-    # print(offspring, 'offa')
-    # print(r, "r")
-
 
     try:
         if not((i - r) < 0):
@@ -134,8 +131,6 @@ def rand_neumann_off(mat, i, j, offspring,r):
     except:
         pass
 
-    # print(neighbors_inds)
-    # print("----")
     return neighbors_inds
 
 
@@ -151,7 +146,7 @@ def initialise(type="RANDOM"):
         grid_b (2D matrix): Allele b grid
 
     """
-    # size = SIZE
+
 
     # create grids randomly
 
@@ -206,20 +201,6 @@ def initialise(type="RANDOM"):
     grid_a = np.random.randint(low=1, high=3,size=(SIZE, SIZE))
     grid_b = np.random.randint(low=1, high=3,size=(SIZE, SIZE))
 
-    # grid_a = np.zeros((SIZE, SIZE))
-    # grid_b = np.zeros((SIZE, SIZE))
-    #
-    # for i in range(SIZE):
-    #     for j in range(SIZE):
-    #         p = np.random.uniform(0,1)
-    #         if p < 0.5:
-    #             grid_a[i][j] = 1
-    #             grid_b[i][j] = 1
-    #         else:
-    #             grid_a[i][j] = 2
-    #             grid_b[i][j] = 2
-
-    # oeps toch een for loop
     for i in range(len(grid_a)):
         for j in range(len(grid_a[0])):
             r = np.random.uniform(0, 1)
@@ -232,6 +213,15 @@ def initialise(type="RANDOM"):
     return grid, grid_a, grid_b
 
 def survival(grids):
+    """
+    Determines which individual on the grid survive the time step
+    Args:
+        grids (list): list of length 3 containing the 2d matrices with individuals
+
+    Returns:
+        grids (list) : list of length 3 containing the 2d matrices with individuals
+    """
+
     grid, grid_a, grid_b = grids
     for i in range(len(grid)):
         for j in range(len(grid[0])):
@@ -254,20 +244,21 @@ def survival(grids):
                 grid_a[i][j] = 0
                 grid_b[i][j] = 0
 
-    # grid_a = np.array([[1, 0, 0, 1, 2],
-    #          [0, 2, 0, 2, 0],
-    #          [0, 2, 2, 0, 1],
-    #          [1, 0, 0, 0, 0],
-    #          [0, 2, 0, 0, 2]])
-    # grid_b = np.array([[1, 0, 0, 2, 1],
-    #          [0, 1, 0, 1, 0],
-    #          [0, 2, 1, 0, 2],
-    #          [2, 0, 0, 0, 0],
-    #          [0, 1, 0, 0, 1]])
     grids = [grid, grid_a, grid_b]
 
     return grids
 def mating(grids):
+    """
+    Creates offspring. Constructs an offspring matrix.
+
+    Args:
+        grids (list): list of length 3 containing the 2d matrices with individuals
+
+    Returns:
+        grids (list) : list of length 5 containing the 2d matrices with individuals
+                        including offspring matrices
+
+    """
     grid, grid_a, grid_b = grids
 
     mat_off_a = np.zeros((SIZE, SIZE))
@@ -288,40 +279,38 @@ def mating(grids):
             mat_off_a[row][col] = offspring_a
             mat_off_b[row][col] = offspring_b
 
-            # exit()
-            # for ind in inds:
-            #     x = ind[0]
-            #     y = ind[1]
-            #
-            #     print(grid_a[x][y])
 
-
-
-
-    # print(mat_off_a, "matoffa")
-    # print(mat_off_b, "matoffb")
     grids.append(mat_off_a)
     grids.append(mat_off_b)
-    print(mat_off_a)
-    print(mat_off_b)
-    
+
+
     return grids
+
+
 def mate(grids, inds, row, col):
+
+    """
+    Creates the offspring of one individual
+    Args:
+        grids (list) : list of length 3 containing the 2d matrices with individuals
+        inds (list)  : the indices of the neighbors that can mate with the individual
+        row (int)    : The row position of the individual
+        col (int)    : The column position of the individual
+
+    Returns:
+        offspring_a (int) : Allele of type A that the offspring gets
+        offspring_b (int) : Allele of type B that the offspring gets
+    """
     S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB, S0 = 0, 0, 0, 0, 0, 0, 0, 0, 0
     grid, grid_a, grid_b = grids
-    # inds.append((row, col))
-    # print("inds:", inds)
-    # print(row, col)
-    # print(grid_a, "gra")
-    # print(grid_b, "grb")
+
+    inds.append((row, col))
+
     # Loop over variables to assign into mating pools
     for ind in inds:
         j = ind[0]
         i = ind[1]
-    # for j in range(len(grid)):
-        # for i in range(len(grid[0])):
-            # print("a", grid_a[row][col])
-            # print("b", grid_b[j][i])
+
 
         p = np.random.uniform(0, 1)
         if grid_a[j][i] == 0 and grid_b[j][i] == 0:
@@ -352,9 +341,11 @@ def mate(grids, inds, row, col):
             else:
                 S1AB += 1
 
+
     # Total mating pool sizes
     S1 = S1ab + S1Ab + S1aB + S1AB
     S2 = S2ab + S2Ab + S2aB + S2AB
+
 
     # Rearrange S variables to permute for the probabilities formula
     Sab = (S1, S2, S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB)
@@ -362,16 +353,17 @@ def mate(grids, inds, row, col):
     SaB = (S1, S2, S1aB, S1AB, S1ab, S1Ab, S2aB, S2AB, S2ab, S2Ab)
     SAB = (S1, S2, S1AB, S1aB, S1Ab, S1ab, S2AB, S2aB, S2Ab, S2ab)
 
-    p_matrix = [probabilities(Sab, 1), probabilities(SaB, 2),
-                        probabilities(SAb, 1), probabilities(SAB,2)]
-    # print("pmat", p_matrix)
+    p_matrix = np.array([probabilities(Sab, 1), probabilities(SaB, 2),
+                        probabilities(SAb, 1), probabilities(SAB,2)])
+
+    for i in range(len(p_matrix)):
+        n = np.sum(p_matrix[i])
+        if not n == 0:
+            p_matrix[i] = p_matrix[i]/n
 
 
     # Loop over grid and create offspring matrix
-
-
     p = np.random.uniform(0, 1)
-    # print("p", p)
 
 
     offspring_a = 0
@@ -441,17 +433,58 @@ def mate(grids, inds, row, col):
             offspring_a = 1
             offspring_b = 1
 
-    # print("chosen: ", offspring_a, offspring_b)
-    # offspring_a = np.array([[0,0,1], [0,0,2], [2,1,0]])
-    # offspring_b = np.array([[0,0,1], [0,0,1], [1,1,0]])
-
     return offspring_a, offspring_b
 # Calculates probabilities
-def probabilities(S,b):
+def probabilities(S, b):
+    """
+    Calculates the probabilites of creating a specific offspring type
+    Args:
+        S (list) : List of data to use in formula
+        b (int)  : Reproducibility type
+    """
+    if S[0] == 0 and S[1] == 0:
+        p1, p2, p3, p4 = 0, 0, 0, 0
+    elif S[0] == 0 and S[1] > 0:
+        if b == 1:
+            p1 = ((1-MATING)/S[1]) * (S[6]+.5*S[7]+.5*S[8]+.25*S[9])
+        else:
+            p1 = ((MATING)/S[1]) * (S[6]+.5*S[7]+.5*S[8]+.25*S[9])
 
-    # 0 = S1, 1 = S2, 2 = a1, 3 = b1, 4 = c1, 5 = d1, 6 = a2, 7 = b2, 8 = c2, 9 = d2
+        if b == 1:
+            p2 = ((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
+        else:
+            p2 = ((MATING)/(2*S[1]))*(S[7]+.5*S[9])
 
-    try:
+        if b == 1:
+            p3 = ((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
+        else:
+            p3 = ((MATING)/(2*S[1]))*(S[8]+.5*S[9])
+
+        p4 = 0
+
+    elif S[1] == 0:
+        if b == 1:
+            p1 = (MATING/S[0]) * (S[2]+.5*S[3] + .5*S[4]+.25*S[5])
+        else:
+            p1 = ((1- MATING)/S[0]) * (S[2]+.5*S[3] + .5*S[4]+.25*S[5])
+
+        if b == 1:
+            p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])
+        else:
+            p2 = ((1 - MATING)/(2*S[0]))*(S[3]+.5*S[5])
+
+        if b == 1:
+            p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])
+        else:
+            p3 = ((1 - MATING)/(2*S[0]))*(S[4]+.5*S[5])
+
+
+        if b == 1:
+            p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
+        else:
+            p4 = ((1 - MATING)/(4*S[0]))*(S[5]) + ((MATING)/(4*S[0]))*(S[9])
+
+    else:
         if b == 1:
             p1 = ((MATING/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((1-MATING)/S[1])
                   *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
@@ -459,45 +492,34 @@ def probabilities(S,b):
             p1 = (((1- MATING)/S[0]) * ( S[2]+.5*S[3] + .5*S[4]+.25*S[5])+((MATING)/S[1])
                   *(S[6]+.5*S[7]+.5*S[8]+.25*S[9]))
 
-    except:
-        p1 = 0
-
-    try:
         if b == 1:
             p2 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
         else:
             p2 = ((1 - MATING)/(2*S[0]))*(S[3]+.5*S[5])+((MATING)/(2*S[1]))*(S[7]+.5*S[9])
 
-        # # new:
-        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
 
-    except:
-        p2 = 0
-
-    try:
         if b == 1:
             p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
         else:
             p3 = ((1 - MATING)/(2*S[0]))*(S[4]+.5*S[5])+((MATING)/(2*S[1]))*(S[8]+.5*S[9])
 
-        # #new:
-        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
-    except:
-        p3 = 0
 
-    try:
         if b == 1:
             p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
         else:
             p4 = ((1 - MATING)/(4*S[0]))*(S[5]) + ((MATING)/(4*S[0]))*(S[9])
-    except:
-        p4 = 0
 
     return p1, p2, p3, p4
 
 def dispersal(grids):
     """
     Places offspring in empty positions in the grid
+    Args:
+        grids (list) : list of length 5 with 2D arrays of individuals and
+                        offspring matrices
+    Returns:
+        grids (list) : list of length 3 with 2D arrays of individuals
+
     """
     grid, grid_a, grid_b, offspring_a, offspring_b = grids
 
@@ -512,35 +534,37 @@ def dispersal(grids):
                 for r in range(R+1):
                     if r == 0:
                         continue
-                    neighbors_inds += rand_neumann_off(grid_a, row, col, offspring_a,r)
+                    neighbors_inds += rand_neumann_off(grid, row, col, offspring_a,r)
 
-                # als maar 1 neighbor: plaats deze in de cel
+
+
+                # if only one neighbor, place in this cell
                 if len(neighbors_inds) == 1:
                     neigh = neighbors_inds[0]
                     x = neigh[0]
                     y = neigh[1]
 
-                    # plaats offspring in lege cel
+                    # place in cell
                     grid_a[row][col] = offspring_a[x][y]
                     grid_b[row][col] = offspring_b[x][y]
 
-                    # verwijder offspring
+                    # remove offspring
                     offspring_a[x][y] = 0
                     offspring_b[x][y] = 0
 
 
-                # kies random offspring van de neigbors
+                # choose random offsrping
                 elif not len(neighbors_inds) == 0:
                     rand_ind = random.randint(0, len(neighbors_inds) - 1)
                     chosen_neigh = neighbors_inds[rand_ind]
                     x = chosen_neigh[0]
                     y = chosen_neigh[1]
 
-                    # plaats offspring in lege cel
+                    # place offspring in cell
                     grid_a[row][col] = offspring_a[x][y]
                     grid_b[row][col] = offspring_b[x][y]
 
-                    # verwijder offspring
+                    # remove offspring
                     offspring_a[x][y] = 0
                     offspring_b[x][y] = 0
 
@@ -549,7 +573,17 @@ def dispersal(grids):
     return grids
 
 def make_figure(grids, plot=True):
+    """
+    Converts matrixs to grid with individual types 1-4, and can plot a heatmap based on
+    these values
+    Args:
+        grids (list) : List of length 3 with 2D matrices of individuals
+        plot (bool)  : Determines wether or not a heatmap is shown
 
+    Returns:
+        figure (2D matrix) : 2D matrix of individual grid with values ranging
+                            from 1 to 4
+    """
     grid, grid_a, grid_b = grids
 
     figure = np.zeros((SIZE, SIZE))
@@ -575,12 +609,11 @@ def make_figure(grids, plot=True):
 
     return figure
 
-# fake data
-# grid = np.array([[1,1,1], [2,1,2], [2,2,2]])
-# grid_a = np.array([[1,1,2], [0,0,2], [2,2,0]])
-# grid_b = np.array([[2,2,1], [0,0,1], [2,1,0]])
 
 def linkage_diseq(counts):
+    """
+    Calculates linkage disequilibrium
+    """
     N4, N3, N1, N2, N0 = counts
     ld = ((N0*N3)-(N1*N2)) / ((SIZE**2 - N4)**2)
 
@@ -621,35 +654,24 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     # holds all linkage diseq. vals
     ld_array = []
     i_s = 0
+    figures = []
     prints = [100, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500,5000,
                 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000-1]
     for i in range(iterations):
         i_s +=1
         if i in prints:
             print(i)
-        grids = survival(grids)
-        print("SRUVIVAL")
-        if iterations - i <= 10:
-            figure = make_figure(grids, plot=True)
-        else:
-            figure = make_figure(grids, plot=False)
-        # let op, output hier zijn 5 elementen
-        grids = mating(grids)
-        print("MAtign")
-        if iterations - i <= 10:
-            figure = make_figure([grids[0], grids[1], grids[2]], plot=True)
-        else:
-            figure = make_figure([grids[0], grids[1], grids[2]], plot=False)
 
-        # en hier weer 3
+        grids = survival(grids)
+
+        grids = mating(grids)
+
         grids = dispersal(grids)
-        print("disp")
 
         grid, grid_a, grid_b = grids
-        if iterations - i <= 10:
-            figure = make_figure(grids, plot=True)
-        else:
-            figure = make_figure(grids, plot=False)
+
+        figure = make_figure(grids, plot=False)
+        figures.append(figure)
 
         # keep up data for the plots
         unique, counts = np.unique(figure, return_counts=True)
@@ -660,6 +682,7 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         el_2 = 0
         el_3 = 0
         el_4 = 0
+
         for j in freqs:
 
             if j[0] == 0:
@@ -685,34 +708,17 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
         ld = linkage_diseq(ld_counts)
         ld_array.append(ld)
 
-        # if abs(ld - 0.25) < ERROR:
-        #     print(f"SPECIATION! Time= {i}")
 
-        # if el_1 == 0 and el_4 == 0:
-        #     print("SPECIATION",i)
-        # elif el_2 == 0 and el_3 == 0:
-        #     print("SPECIATION",i)
-        # else:
-        #     print("NO LONGER SPECIATION")
-        #
-
-    # mkake figure
-    figure = make_figure(grids)
+    # make figure
+    figure = make_figure(grids, plot=False)
     x = list(range(i_s))
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    # try:
+    #     Path(f"/Users/annemijndijkhuis/Documents/Computational Science/Complex systems sims/complex_systems/spatial/data/allo/s={SURVIVAL}").mkdir(parents=True, exist_ok=True)
+    #
+    #     pickle.dump([x, type_1, type_2, type_3, type_4, ld_array, figures],
+    #     open(f"data/allo/s={SURVIVAL}/n={iterations}_p={MATING}_{timestr}.p", "wb"))
+    # except:
+    #     pass
 
-
-    # make freq plots
-    plt.plot(x, type_1, label="ab")
-    plt.plot(x , type_2 , label="aB")
-    plt.plot(x , type_3 , label="Ab")
-    plt.plot(x , type_4 , label="AB")
-    plt.title(f"{GRID_TYPE}, n={iterations}, p={MATING}, s={SURVIVAL}")
-
-
-    plt.legend()
-    plt.show()
-
-    plt.plot(ld_array)
-    plt.show()
-
-    return figure
+    return [x, type_1, type_2, type_3, type_4, ld_array, figures]
