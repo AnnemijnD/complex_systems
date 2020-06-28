@@ -101,6 +101,7 @@ def initialise(type="RANDOM"):
             for col in range(SIZE):
                 if row <= Hab1:
                     grid[row][col] = 1
+                else:
                     grid[row][col] = 2
 
     elif type == "NON_STRUCTURED":
@@ -313,16 +314,10 @@ def probabilities(S, b):
         else:
             p2 = ((1 - MATING)/(2*S[0]))*(S[3]+.5*S[5])
 
-        # # new:
-        # p2  = (MATING/(2*S[0]))*(S[4]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[8]+.5*S[9])
-
         if b == 1:
             p3 = (MATING/(2*S[0]))*(S[4]+.5*S[5])
         else:
             p3 = ((1 - MATING)/(2*S[0]))*(S[4]+.5*S[5])
-
-        # #new:
-        # p3 = (MATING/(2*S[0]))*(S[3]+.5*S[5])+((1-MATING)/(2*S[1]))*(S[7]+.5*S[9])
 
         if b == 1:
             p4 = (MATING/(4*S[0]))*(S[5]) + ((1-MATING)/(4*S[0]))*(S[9])
@@ -429,11 +424,6 @@ def make_figure(grids, z=1, plot=True, save=False):
         cmap = mcolors.LinearSegmentedColormap.from_list("n",['#FFFFFF','#20639B','#3CAEA3','#F6D55C','#ED553B'])
         sns.heatmap(figure, clim=(0, 4),cmap=cmap, norm=norm, vmin=0, vmax=4)
         plt.title(f"Spatial Grid: {SIZE}x{SIZE}; p = {MATING}; s = {SURVIVAL[1]}; e = {EMPTY_CELLS}; t = {GRID_TYPE}")
-        if not save:
-            plt.savefig(f"spatial\\plots\\final_plots\\fig1_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}_{z}.png")
-        else:
-            plt.show()
-
     return figure
 
 
@@ -462,7 +452,7 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
 
     global GRID_TYPE
     GRID_TYPE = grid_type
-    
+
     # Initialise grid
     grid, grid_a, grid_b = initialise(GRID_TYPE)
     grids = [grid, grid_a, grid_b]
@@ -490,13 +480,12 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
 
         # Careful, 5 output elements
         grids = mating(grids)
-
         # Back to 3 elements
         random.shuffle(coordinates)
         grids = dispersal(grids, coordinates)
 
         grid, grid_a, grid_b = grids
-        figure = make_figure(grids, plot=False)
+        figure = make_figure(grids, plot=False, save=False)
 
         # keep up data for the plots
         unique, counts = np.unique(figure, return_counts=True)
@@ -554,7 +543,7 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     if plot:
         plt.show()
     else:
-        plt.savefig(f"spatial\\plots\\final_plots\\fig2_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}.png")
+        plt.close()
 
     figure3 = plt.figure()
     plt.xlabel("iterations")
@@ -564,6 +553,6 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     if plot:
         plt.show()
     else:
-        plt.savefig(f"spatial\\plots\\final_plots\\fig3_{SIZE}_{EMPTY_CELLS}_{SURVIVAL[1]}_{MATING}.png")
+        plt.close()
 
     return i
