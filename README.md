@@ -13,4 +13,4 @@ Final model states may vary due to the stochastic nature of the model. The CUSTO
 
 To run the second model, run the cells from the 'non_spatial/Organism Mutation/Genes.ipynb' file in Jupyter Notebook. The parameters can be altered in the first cell. 
 
-In the Analysis directory data for the plots and the plots themselves are given.
+In the non_spatial/Analysis directory data for the plots and the plots themselves are given.
