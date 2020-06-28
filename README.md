@@ -1,4 +1,4 @@
-# Complex Systems Simulation
+# Complex Systems Simulation group 9
 
 ## MODEL 1: SPECIATION
 
@@ -10,3 +10,7 @@ ALLOPATRIC: 1 model, running time approximately 10 min.
 Final model states may vary due to the stochastic nature of the model. The CUSTOM options runs the basic models with custom input parameters.
 
 ## MODEL 2: MUTATION
+
+To run the second model, run the cells from the 'non_spatial/Organism Mutation/Genes.ipynb' file in Jupyter Notebook. The parameters can be altered in the first cell. 
+
+In the non_spatial/Analysis directory data for the plots and the plots themselves are given.
