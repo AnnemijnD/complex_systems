@@ -104,16 +104,14 @@ else:
 
 
         elif  sys.argv[1] == "ALLOPATRIC" and sys.argv[2] == "STANDARD":
-            iterations = 5
-            for i in range(iterations):
-                print(f"Running iterations {i} out of {iterations}")
-                x, type_1, type_2, type_3, type_4, ld_array, figures = allo_model.run_model(5000, size=25, grid_type="STRUCTURED", empty=0, survive={1:0.95, 2:0.95}, p=0.5)
+        
+            x, type_1, type_2, type_3, type_4, ld_array, figures = allo_model.run_model(5000, size=25, grid_type="STRUCTURED", empty=0, survive={1:0.95, 2:0.95}, p=0.5)
 
 
-                norm = plt.Normalize(0,4)
-                cmap = mcolors.LinearSegmentedColormap.from_list("n",['#FFFFFF','#20639B','#3CAEA3','#F6D55C','#ED553B'])
-                sns.heatmap(figures[-1], clim=(0, 4),cmap=cmap, norm=norm, vmin=0, vmax=4)
-                plt.show()
+            norm = plt.Normalize(0,4)
+            cmap = mcolors.LinearSegmentedColormap.from_list("n",['#FFFFFF','#20639B','#3CAEA3','#F6D55C','#ED553B'])
+            sns.heatmap(figures[-1], clim=(0, 4),cmap=cmap, norm=norm, vmin=0, vmax=4)
+            plt.show()
 
 
         elif sys.argv[1] == "ALLOPATRIC" and sys.argv[2] == "CUSTOM":

@@ -660,7 +660,7 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     for i in range(iterations):
         i_s +=1
         if i in prints:
-            print(i)
+            print(f"Currently at iteration {i}")
 
         grids = survival(grids)
 
