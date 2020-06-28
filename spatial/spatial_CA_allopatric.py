@@ -131,8 +131,6 @@ def rand_neumann_off(mat, i, j, offspring,r):
     except:
         pass
 
-    # print(neighbors_inds)
-    # print("----")
     return neighbors_inds
 
 
@@ -215,6 +213,15 @@ def initialise(type="RANDOM"):
     return grid, grid_a, grid_b
 
 def survival(grids):
+    """
+    Determines which individual on the grid survive the time step
+    Args:
+        grids (list): list of length 3 containing the 2d matrices with individuals
+
+    Returns:
+        grids (list) : list of length 3 containing the 2d matrices with individuals
+    """
+
     grid, grid_a, grid_b = grids
     for i in range(len(grid)):
         for j in range(len(grid[0])):
@@ -241,6 +248,17 @@ def survival(grids):
 
     return grids
 def mating(grids):
+    """
+    Creates offspring. Constructs an offspring matrix.
+
+    Args:
+        grids (list): list of length 3 containing the 2d matrices with individuals
+
+    Returns:
+        grids (list) : list of length 5 containing the 2d matrices with individuals
+                        including offspring matrices
+
+    """
     grid, grid_a, grid_b = grids
 
     mat_off_a = np.zeros((SIZE, SIZE))
@@ -267,7 +285,22 @@ def mating(grids):
 
 
     return grids
+
+
 def mate(grids, inds, row, col):
+
+    """
+    Creates the offspring of one individual
+    Args:
+        grids (list) : list of length 3 containing the 2d matrices with individuals
+        inds (list)  : the indices of the neighbors that can mate with the individual
+        row (int)    : The row position of the individual
+        col (int)    : The column position of the individual
+
+    Returns:
+        offspring_a (int) : Allele of type A that the offspring gets
+        offspring_b (int) : Allele of type B that the offspring gets
+    """
     S1ab, S1Ab, S1aB, S1AB, S2ab, S2Ab, S2aB, S2AB, S0 = 0, 0, 0, 0, 0, 0, 0, 0, 0
     grid, grid_a, grid_b = grids
 
@@ -403,7 +436,12 @@ def mate(grids, inds, row, col):
     return offspring_a, offspring_b
 # Calculates probabilities
 def probabilities(S, b):
-
+    """
+    Calculates the probabilites of creating a specific offspring type
+    Args:
+        S (list) : List of data to use in formula
+        b (int)  : Reproducibility type
+    """
     if S[0] == 0 and S[1] == 0:
         p1, p2, p3, p4 = 0, 0, 0, 0
     elif S[0] == 0 and S[1] > 0:
@@ -476,6 +514,12 @@ def probabilities(S, b):
 def dispersal(grids):
     """
     Places offspring in empty positions in the grid
+    Args:
+        grids (list) : list of length 5 with 2D arrays of individuals and
+                        offspring matrices
+    Returns:
+        grids (list) : list of length 3 with 2D arrays of individuals
+
     """
     grid, grid_a, grid_b, offspring_a, offspring_b = grids
 
@@ -529,7 +573,17 @@ def dispersal(grids):
     return grids
 
 def make_figure(grids, plot=True):
+    """
+    Converts matrixs to grid with individual types 1-4, and can plot a heatmap based on
+    these values
+    Args:
+        grids (list) : List of length 3 with 2D matrices of individuals
+        plot (bool)  : Determines wether or not a heatmap is shown
 
+    Returns:
+        figure (2D matrix) : 2D matrix of individual grid with values ranging
+                            from 1 to 4
+    """
     grid, grid_a, grid_b = grids
 
     figure = np.zeros((SIZE, SIZE))
@@ -557,6 +611,9 @@ def make_figure(grids, plot=True):
 
 
 def linkage_diseq(counts):
+    """
+    Calculates linkage disequilibrium
+    """
     N4, N3, N1, N2, N0 = counts
     ld = ((N0*N3)-(N1*N2)) / ((SIZE**2 - N4)**2)
 
@@ -664,4 +721,4 @@ def run_model(iterations, size=SIZE, survive=SURVIVAL, p=MATING, empty=EMPTY_CEL
     except:
         pass
 
-    return figure
+    return [x, type_1, type_2, type_3, type_4, ld_array, figures]
